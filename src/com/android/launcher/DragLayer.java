@@ -171,8 +171,13 @@ public class DragLayer extends FrameLayout implements DragController {
 
         boolean willNotCache = v.willNotCacheDrawing();
         v.setWillNotCacheDrawing(false);
-        v.buildDrawingCache();
 
+        // Reset the drawing cache background color to fully transparent
+        // for the duration of this operation
+        int color = v.getDrawingCacheBackgroundColor();
+        v.setDrawingCacheBackgroundColor(0);
+
+        v.buildDrawingCache();
         Bitmap viewBitmap = v.getDrawingCache();
         int width = viewBitmap.getWidth();
         int height = viewBitmap.getHeight();
@@ -191,6 +196,7 @@ public class DragLayer extends FrameLayout implements DragController {
         mDragBitmap = Bitmap.createBitmap(viewBitmap, 0, 0, width, height, scale, true);
         v.destroyDrawingCache();
         v.setWillNotCacheDrawing(willNotCache);
+        v.setDrawingCacheBackgroundColor(color);
 
         final Bitmap dragBitmap = mDragBitmap;
         mBitmapOffsetX = (dragBitmap.getWidth() - width) / 2;
