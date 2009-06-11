@@ -132,7 +132,7 @@ public class LauncherModel {
 
         if (localeChanged) {
             dropApplicationCache();
-        }        
+        }
 
         if (mApplicationsAdapter == null || isLaunching || localeChanged) {
             mApplications = new ArrayList<ApplicationInfo>(DEFAULT_APPLICATIONS_NUMBER);
@@ -142,7 +142,7 @@ public class LauncherModel {
         mApplicationsLoaded = false;
 
         if (!isLaunching) {
-            startApplicationsLoader(launcher);
+            startApplicationsLoader(launcher, false);
             return false;
         }
 
@@ -164,19 +164,19 @@ public class LauncherModel {
         }
     }
 
-    private synchronized void startApplicationsLoader(Launcher launcher) {
+    private synchronized void startApplicationsLoader(Launcher launcher, boolean isLaunching) {
         if (DEBUG_LOADERS) d(LOG_TAG, "  --> starting applications loader");
 
         stopAndWaitForApplicationsLoader();
 
-        mApplicationsLoader = new ApplicationsLoader(launcher);
+        mApplicationsLoader = new ApplicationsLoader(launcher, isLaunching);
         mApplicationsLoaderThread = new Thread(mApplicationsLoader, "Applications Loader");
         mApplicationsLoaderThread.start();
     }
 
     synchronized void addPackage(Launcher launcher, String packageName) {
         if (mApplicationsLoader != null && mApplicationsLoader.isRunning()) {
-            startApplicationsLoader(launcher);
+            startApplicationsLoader(launcher, false);
             return;
         }
 
@@ -202,7 +202,7 @@ public class LauncherModel {
     synchronized void removePackage(Launcher launcher, String packageName) {
         if (mApplicationsLoader != null && mApplicationsLoader.isRunning()) {
             dropApplicationCache(); // TODO: this could be optimized
-            startApplicationsLoader(launcher);
+            startApplicationsLoader(launcher, false);
             return;
         }
 
@@ -237,7 +237,7 @@ public class LauncherModel {
 
     synchronized void updatePackage(Launcher launcher, String packageName) {
         if (mApplicationsLoader != null && mApplicationsLoader.isRunning()) {
-            startApplicationsLoader(launcher);
+            startApplicationsLoader(launcher, false);
             return;
         }
 
@@ -279,7 +279,7 @@ public class LauncherModel {
 
     synchronized void syncPackage(Launcher launcher, String packageName) {
         if (mApplicationsLoader != null && mApplicationsLoader.isRunning()) {
-            startApplicationsLoader(launcher);
+            startApplicationsLoader(launcher, false);
             return;
         }
 
@@ -477,8 +477,10 @@ public class LauncherModel {
 
         private volatile boolean mStopped;
         private volatile boolean mRunning;
+        private final boolean mIsLaunching;
 
-        ApplicationsLoader(Launcher launcher) {
+        ApplicationsLoader(Launcher launcher, boolean isLaunching) {
+            mIsLaunching = isLaunching;
             mLauncher = new WeakReference<Launcher>(launcher);
         }
 
@@ -499,7 +501,10 @@ public class LauncherModel {
         public void run() {
             mRunning = true;
 
-            android.os.Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
+            // Elevate priority when Home launches for the first time to avoid
+            // starving at boot time. Staring at a blank home is not cool.
+            android.os.Process.setThreadPriority(mIsLaunching ? Process.THREAD_PRIORITY_DEFAULT :
+                    Process.THREAD_PRIORITY_BACKGROUND);
 
             final Intent mainIntent = new Intent(Intent.ACTION_MAIN, null);
             mainIntent.addCategory(Intent.CATEGORY_LAUNCHER);
@@ -693,7 +698,7 @@ public class LauncherModel {
 
         if (isLaunching && isDesktopLoaded()) {
             if (DEBUG_LOADERS) d(LOG_TAG, "  --> items loaded, return");
-            if (loadApplications) startApplicationsLoader(launcher);
+            if (loadApplications) startApplicationsLoader(launcher, true);
             // We have already loaded our data from the DB
             launcher.onDesktopItemsLoaded();
             return;
@@ -720,7 +725,8 @@ public class LauncherModel {
 
         if (DEBUG_LOADERS) d(LOG_TAG, "  --> starting workspace loader");
         mDesktopItemsLoaded = false;
-        mDesktopItemsLoader = new DesktopItemsLoader(launcher, localeChanged, loadApplications);
+        mDesktopItemsLoader = new DesktopItemsLoader(launcher, localeChanged, loadApplications,
+                isLaunching);
         mDesktopLoaderThread = new Thread(mDesktopItemsLoader, "Desktop Items Loader");
         mDesktopLoaderThread.start();
     }
@@ -801,9 +807,12 @@ public class LauncherModel {
         private final WeakReference<Launcher> mLauncher;
         private final boolean mLocaleChanged;
         private final boolean mLoadApplications;
+        private final boolean mIsLaunching;
 
-        DesktopItemsLoader(Launcher launcher, boolean localeChanged, boolean loadApplications) {
+        DesktopItemsLoader(Launcher launcher, boolean localeChanged, boolean loadApplications,
+                boolean isLaunching) {
             mLoadApplications = loadApplications;
+            mIsLaunching = isLaunching;
             mLauncher = new WeakReference<Launcher>(launcher);
             mLocaleChanged = localeChanged;
         }
@@ -818,6 +827,8 @@ public class LauncherModel {
 
         public void run() {
             mRunning = true;
+
+            android.os.Process.setThreadPriority(Process.THREAD_PRIORITY_DEFAULT);
 
             final Launcher launcher = mLauncher.get();
             final ContentResolver contentResolver = launcher.getContentResolver();
@@ -1025,7 +1036,7 @@ public class LauncherModel {
                         launcher.onDesktopItemsLoaded();
                     }
                 });
-                if (mLoadApplications) startApplicationsLoader(launcher);
+                if (mLoadApplications) startApplicationsLoader(launcher, mIsLaunching);
             }
 
             if (!mStopped) {
@@ -1189,7 +1200,7 @@ public class LauncherModel {
     ArrayList<ItemInfo> getDesktopItems() {
         return mDesktopItems;
     }
-    
+
     /**
      * @return The current list of desktop items
      */
@@ -1205,7 +1216,7 @@ public class LauncherModel {
         // TODO: write to DB; also check that folder has been added to folders list
         mDesktopItems.add(info);
     }
-    
+
     /**
      * Remove an item from the desktop
      * @param info
@@ -1221,7 +1232,7 @@ public class LauncherModel {
     void addDesktopAppWidget(LauncherAppWidgetInfo info) {
         mDesktopAppWidgets.add(info);
     }
-    
+
     /**
      * Remove a widget from the desktop
      */
@@ -1239,7 +1250,7 @@ public class LauncherModel {
         if (resolveInfo == null) {
             return null;
         }
-        
+
         final ApplicationInfo info = new ApplicationInfo();
         final ActivityInfo activityInfo = resolveInfo.activityInfo;
         info.icon = Utilities.createIconThumbnail(activityInfo.loadIcon(manager), context);
@@ -1252,7 +1263,7 @@ public class LauncherModel {
         info.itemType = LauncherSettings.Favorites.ITEM_TYPE_APPLICATION;
         return info;
     }
-    
+
     /**
      * Make an ApplicationInfo object for a sortcut
      */
@@ -1308,7 +1319,7 @@ public class LauncherModel {
         //noinspection SuspiciousMethodCalls
         folder.contents.remove(info);
     }
-    
+
     /**
      * Removes a UserFolder from the in-memory list of folders. Does not change the DB.
      * @param userFolderInfo
@@ -1316,7 +1327,7 @@ public class LauncherModel {
     void removeUserFolder(UserFolderInfo userFolderInfo) {
         mFolders.remove(userFolderInfo.id);
     }
-    
+
     /**
      * Adds an item to the DB if it was not created previously, or move it to a new
      * <container, screen, cellX, cellY>
@@ -1331,7 +1342,7 @@ public class LauncherModel {
             moveItemInDatabase(context, item, container, screen, cellX, cellY);
         }
     }
-    
+
     /**
      * Move an item in the DB to a new <container, screen, cellX, cellY>
      */
@@ -1341,7 +1352,7 @@ public class LauncherModel {
         item.screen = screen;
         item.cellX = cellX;
         item.cellY = cellY;
-     
+
         final ContentValues values = new ContentValues();
         final ContentResolver cr = context.getContentResolver();
 
@@ -1424,12 +1435,12 @@ public class LauncherModel {
         item.screen = screen;
         item.cellX = cellX;
         item.cellY = cellY;
-        
+
         final ContentValues values = new ContentValues();
         final ContentResolver cr = context.getContentResolver();
-        
+
         item.onAddToDatabase(values);
-        
+
         Uri result = cr.insert(notify ? LauncherSettings.Favorites.CONTENT_URI :
                 LauncherSettings.Favorites.CONTENT_URI_NO_NOTIFICATION, values);
 
@@ -1449,7 +1460,7 @@ public class LauncherModel {
 
         cr.update(LauncherSettings.Favorites.getContentUri(item.id, false), values, null, null);
     }
-    
+
     /**
      * Removes the specified item from the database
      * @param context
