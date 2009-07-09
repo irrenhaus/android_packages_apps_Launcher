@@ -22,7 +22,7 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent">
 
-    <!-- The workspace contains 3 screens of cells -->
+    <!-- The workspace contains 5 screens of cells -->
     <com.android.launcher.Workspace
         android:id="@+id/workspace"
         android:layout_width="fill_parent"
@@ -80,7 +80,7 @@
             android:nextFocusRight="@id/content"
 
             android:verticalSpacing="10dip"
-            android:numColumns="5" />
+            android:numColumns="6" />
 
     </SlidingDrawer>
 
