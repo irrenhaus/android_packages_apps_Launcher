@@ -43,6 +43,7 @@ public class WallpaperChooser extends Activity implements AdapterView.OnItemSele
         OnClickListener {
 
     private static final Integer[] THUMB_IDS = {
+	    R.drawable.wallpaper_skate_small,
             R.drawable.wallpaper_lake_small,
             R.drawable.wallpaper_sunset_small,
             R.drawable.wallpaper_beach_small,
@@ -60,6 +61,7 @@ public class WallpaperChooser extends Activity implements AdapterView.OnItemSele
     };
 
     private static final Integer[] IMAGE_IDS = {
+	    R.drawable.wallpaper_skate,
             R.drawable.wallpaper_lake,
             R.drawable.wallpaper_sunset,
             R.drawable.wallpaper_beach,
