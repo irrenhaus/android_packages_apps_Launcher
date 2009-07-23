@@ -75,6 +75,38 @@ public final class ExtendedSettings {
         Log.d(Tag, "Default homescreen set to "+Screen);
 	}
 
+    public static int Sensor_Enabled(Context context)
+    {
+        SQLiteDatabase mDatabase;
+        ExtendedSensorDBHelper hlp = new ExtendedSensorDBHelper(context);
+        mDatabase = hlp.getWritableDatabase();
+
+        Cursor eCursor = mDatabase.query(false, "extendedsensor", new String[] { "sensorenabled" }, "name='rotation'", null, null, null, null, null);
+        eCursor.moveToFirst();
+
+        int enabled = eCursor.getInt(0);
+
+        eCursor.close();
+        mDatabase.close();
+
+        return enabled;
+    }
+
+    public static void Set_Sensor_Enabled(Context context, int Enabled)
+    {
+        SQLiteDatabase mDatabase;
+        ExtendedSensorDBHelper hlp = new ExtendedSensorDBHelper(context);
+        mDatabase = hlp.getWritableDatabase();
+
+        ContentValues updateValues = new ContentValues();
+        updateValues.put("sensorenabled", Enabled);
+
+        mDatabase.update("extendedsensor", updateValues, "name='rotation'", null);
+        mDatabase.close();
+
+        Log.d(Tag, "Sensor-based rotation set to " + Enabled);
+    }
+
 	/** Database */
 	protected static class ExtendedHomeDBHelper extends SQLiteOpenHelper {
 		public ExtendedHomeDBHelper(Context context) {
@@ -95,5 +127,26 @@ public final class ExtendedSettings {
 		public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 		}
 	}	
+
+    /** Database */
+    protected static class ExtendedSensorDBHelper extends SQLiteOpenHelper {
+        public ExtendedSensorDBHelper(Context context) {
+            super(context, "extendedsensor.sqlite", null, 1);
+        }
+
+        @Override
+        public void onCreate(SQLiteDatabase db) {
+            String ddlScripts = "create table extendedsensor (name text, sensorenabled integer);";
+            db.execSQL(ddlScripts);
+
+            ddlScripts = "insert into extendedsensor (name, sensorenabled) values ('rotation', 1);";
+            db.execSQL(ddlScripts);
+
+        }
+
+        @Override
+        public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        }
+    }
 	
 }
