@@ -105,6 +105,7 @@ public final class Launcher extends Activity implements View.OnClickListener, On
     private static final int MENU_SEARCH = MENU_WALLPAPER_SETTINGS + 1;
     private static final int MENU_NOTIFICATIONS = MENU_SEARCH + 1;
     private static final int MENU_SETTINGS = MENU_NOTIFICATIONS + 1;
+    private static final int MENU_EXTENDED = MENU_SETTINGS + 1;
 
     private static final int REQUEST_CREATE_SHORTCUT = 1;
     private static final int REQUEST_CREATE_LIVE_FOLDER = 4;
@@ -242,6 +243,9 @@ public final class Launcher extends Activity implements View.OnClickListener, On
         // For handling default keys
         mDefaultKeySsb = new SpannableStringBuilder();
         Selection.setSelection(mDefaultKeySsb, 0);
+
+        /* Rogro82@xda Extended : expose active launcher */
+        ExtendedDrawerSettings.activeLauncher = this;
     }
 
     private void checkForLocaleChange() {
@@ -996,6 +1000,12 @@ public final class Launcher extends Activity implements View.OnClickListener, On
         menu.add(0, MENU_SETTINGS, 0, R.string.menu_settings)
                 .setIcon(android.R.drawable.ic_menu_preferences).setAlphabeticShortcut('P')
                 .setIntent(settings);
+        
+        /* Rogro82@xda Extended : Extended settings */
+        final Intent extendedsettings = new Intent(Launcher.this, ExtendedSettings.class);
+        menu.add(0, MENU_EXTENDED, 0, R.string.menu_extended)
+                .setIcon(android.R.drawable.ic_menu_preferences).setAlphabeticShortcut('D')
+                .setIntent(extendedsettings);
 
         return true;
     }

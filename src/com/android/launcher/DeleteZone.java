@@ -16,10 +16,16 @@
 
 package com.android.launcher;
 
+import com.android.launcher.ExtendedDrawerSettings.ExtendedDrawerDBHelper;
 import android.widget.ImageView;
+import android.widget.Toast;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Rect;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.animation.TranslateAnimation;
@@ -83,12 +89,55 @@ public class DeleteZone extends ImageView implements DropTarget, DragController.
         return null;
     }
 
+	SQLiteDatabase mDatabase;
+    
     public void onDrop(DragSource source, int x, int y, int xOffset, int yOffset, Object dragInfo) {
         final ItemInfo item = (ItemInfo) dragInfo;
 
-        if (item.container == -1) return;
+		Toast toast;        
+        /* Rogro82@xda Extended : Check for application drawer items on delete and if so add them to the database */
+        if (item.container == ItemInfo.NO_ID)
+        {
+        	if (item instanceof ApplicationInfo)
+        	{
+        		final ApplicationInfo application = (ApplicationInfo) item;
+        		
+        		ExtendedDrawerDBHelper hlp = new ExtendedDrawerDBHelper(this.getContext());                 
+                mDatabase = hlp.getWritableDatabase(); 
 
+                Cursor eCursor = mDatabase.query(false, "extendeddrawer_hidden", new String[] { "_id", "name", "intent" }, "intent='" + application.intent.toURI() + "'", null, null, null, null, null);
+
+                //Only show if its not in the appdrawer table
+                if(eCursor.getCount()==0)
+                {
+                
+                ContentValues insertValues = new ContentValues();
+		        insertValues.put("name", (String) application.title);
+		        insertValues.put("intent", application.intent.toURI());
+		        mDatabase.insert("extendeddrawer_hidden", "", insertValues);
+		        
+                }
+
+                eCursor.close();
+                mDatabase.close();
+                
+                toast = Toast.makeText(this.getContext(), "Application '" + application.title + "' has been hidden from the application drawer.", Toast.LENGTH_SHORT);
+            	toast.show();
+            	
+                final LauncherModel model = Launcher.getModel();
+
+                model.dropApplications();
+                model.loadApplications(false, mLauncher, false);
+            	
+            	
+        	}
+        	
+        	return;
+        	
+        }
+        
         final LauncherModel model = Launcher.getModel();
+
         if (item.container == LauncherSettings.Favorites.CONTAINER_DESKTOP) {
             if (item instanceof LauncherAppWidgetInfo) {
                 model.removeDesktopAppWidget((LauncherAppWidgetInfo) item);
