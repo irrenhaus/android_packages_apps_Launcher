@@ -122,5 +122,7 @@
     <string name="menu_extended_home_screens">Number of home screens</string>
     <string name="menu_extended_home_default">Default home screen</string>
     <string name="menu_extended_home_info">Any change made to the number of home screens or the default screen will require a reset.</string>
+    <string name="menu_extended_sensor">Extended Sensor</string>
+    <string name="menu_extended_sensor_info">Enable sensor-based rotation for the home screen</string> 
 
 </resources>

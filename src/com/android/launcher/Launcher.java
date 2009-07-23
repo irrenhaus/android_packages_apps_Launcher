@@ -246,6 +246,12 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 
         /* Rogro82@xda Extended : expose active launcher */
         ExtendedDrawerSettings.activeLauncher = this;
+
+        /* Rogro82@xda Extended : check and possibly disable auto-rotate */
+        if(com.android.launcher.Extended.Data.ExtendedSettings.Sensor_Enabled(this.getApplicationContext())==0) {
+            this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);
+        }
+
     }
     
     private void checkForLocaleChange() {

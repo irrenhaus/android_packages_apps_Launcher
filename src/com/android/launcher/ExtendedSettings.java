@@ -49,7 +49,13 @@ public class ExtendedSettings extends Activity {
 					final Intent extendedhomesettings = new Intent(ExtendedSettings.this, ExtendedHomeSettings.class);
 					startActivity(extendedhomesettings);
 				}
-				
+			    
+                if(selected.Tag=="Sensor")
+                {
+                    final Intent extendedsensorsettings = new Intent(ExtendedSettings.this, ExtendedSensorSettings.class);
+                    startActivity(extendedsensorsettings);
+                }
+     
 			}        	
         }
         );
