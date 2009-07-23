@@ -28,6 +28,7 @@ import android.graphics.Rect;
 import android.graphics.Region;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.View;
@@ -100,6 +101,9 @@ public class Workspace extends ViewGroup implements DropTarget, DragSource, Drag
     final Rect mClipBounds = new Rect();
     int mDrawerContentHeight;
     int mDrawerContentWidth;
+    
+    int mHomeScreens = 3;
+    int mHomeScreensLoaded = 0;
 
     /**
      * Used to inflate the Workspace from XML.
@@ -122,7 +126,11 @@ public class Workspace extends ViewGroup implements DropTarget, DragSource, Drag
         super(context, attrs, defStyle);
 
         TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.Workspace, defStyle, 0);
-        mDefaultScreen = a.getInt(R.styleable.Workspace_defaultScreen, 1);
+
+        /* Rogro82@xda Extended : Load the default and number of homescreens from the settings database */
+        mDefaultScreen = com.android.launcher.Extended.Data.ExtendedSettings.Home_DefaultScreen(context);
+        mHomeScreens = com.android.launcher.Extended.Data.ExtendedSettings.Home_HomeScreens(context.getApplicationContext());
+
         a.recycle();
 
         initWorkspace();
@@ -157,7 +165,13 @@ public class Workspace extends ViewGroup implements DropTarget, DragSource, Drag
         if (!(child instanceof CellLayout)) {
             throw new IllegalArgumentException("A Workspace can only have CellLayout children.");
         }
-        super.addView(child, index, params);
+
+        /* Rogro82@xda Extended : Only load the number of home screens set */
+        if(mHomeScreensLoaded < mHomeScreens)
+        {
+            mHomeScreensLoaded++;
+            super.addView(child, index, params);
+        }
     }
 
     @Override
@@ -331,7 +345,8 @@ public class Workspace extends ViewGroup implements DropTarget, DragSource, Drag
      */
     void addInScreen(View child, int screen, int x, int y, int spanX, int spanY, boolean insert) {
         if (screen < 0 || screen >= getChildCount()) {
-            throw new IllegalStateException("The screen must be >= 0 and < " + getChildCount());
+            /* Rogro82@xda Extended : Do not throw an exception else it will crash when there is an item on a hidden homescreen */
+            return;
         }
 
         final CellLayout group = (CellLayout) getChildAt(screen);

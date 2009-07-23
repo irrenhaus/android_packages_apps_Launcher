@@ -26,12 +26,16 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.content.res.Resources;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import static android.util.Log.*;
 import android.os.Process;
+import android.util.Log;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -40,6 +44,8 @@ import java.util.Comparator;
 import java.lang.ref.WeakReference;
 import java.text.Collator;
 import java.net.URISyntaxException;
+
+import com.android.launcher.ExtendedDrawerSettings.ExtendedDrawerDBHelper;
 
 /**
  * Maintains in-memory state of the Launcher. It is expected that there should be only one
@@ -93,6 +99,13 @@ public class LauncherModel {
      */
     synchronized void dropApplicationCache() {
         mAppInfoCache.clear();
+    }
+
+    /* Rogro82@xda Extended : Drop all applications and adapter to reload after removal or restore of an app drawer shortcut */
+    synchronized void dropApplications() {
+        mAppInfoCache.clear();
+        mApplications.clear();
+        mApplicationsAdapter.clear();
     }
 
     /**
@@ -474,6 +487,9 @@ public class LauncherModel {
             return mRunning;
         }
 
+        /* Rogro82@xda Extended : check for applications in extendeddrawer_hidden database */
+        SQLiteDatabase mDatabase;
+
         public void run() {
             mRunning = true;
 
@@ -494,18 +510,29 @@ public class LauncherModel {
 
                 ChangeNotifier action = new ChangeNotifier(applicationList, true);
                 final HashMap<ComponentName, ApplicationInfo> appInfoCache = mAppInfoCache;
+                
+                ExtendedDrawerDBHelper hlp = new ExtendedDrawerDBHelper(launcher.getApplicationContext()); 
+                mDatabase = hlp.getWritableDatabase();
 
                 for (int i = 0; i < count && !mStopped; i++) {
                     ResolveInfo info = apps.get(i);
                     ApplicationInfo application =
                         makeAndCacheApplicationInfo(manager, appInfoCache, info, launcher);
 
-                    if (action.add(application) && !mStopped) {
-                        launcher.runOnUiThread(action);
-                        action = new ChangeNotifier(applicationList, false);
+                    Cursor eCursor = mDatabase.query(false, "extendeddrawer_hidden", new String[] { "_id", "name", "intent" }, "intent='" + application.intent.toURI() + "'", null, null, null, null, null);
+                    
+                    //Only show if its not in the appdrawer table
+                    if(eCursor.getCount()==0) {
+                        if (action.add(application) && !mStopped) {
+                            launcher.runOnUiThread(action);
+                            action = new ChangeNotifier(applicationList, false);
+                        }
                     }
+
+                    eCursor.close();
                 }
 
+                mDatabase.close();
                 launcher.runOnUiThread(action);
             }
 

@@ -80,6 +80,10 @@
             </intent-filter>
         </activity>
 
+	<activity android:name="ExtendedSettings" android:label="@string/menu_extended" />
+	<activity android:name="ExtendedDrawerSettings" android:label="@string/menu_extended_drawer" />
+	<activity android:name="ExtendedHomeSettings" android:label="@string/menu_extended_home" />
+
         <activity
             android:name="WallpaperChooser"
             android:label="@string/pick_wallpaper"
