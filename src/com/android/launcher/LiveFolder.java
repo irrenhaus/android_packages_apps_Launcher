@@ -59,6 +59,13 @@ public class LiveFolder extends Folder {
                 uri = uri.buildUpon().appendPath(Long.toString(holder.id)).build();
                 intent.setData(uri);
                 mLauncher.startActivitySafely(intent);
+                
+                //irrenhaus
+                if(com.android.launcher.Extended.Data.ExtendedSettings.Home_CloseFolders(parent.getContext().getApplicationContext()))
+                {
+	                // Close the folder when an app is started
+	                mLauncher.closeFolder(this);
+                }
             }
         } else if (holder.intent != null) {
             mLauncher.startActivitySafely(holder.intent);

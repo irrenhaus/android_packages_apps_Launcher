@@ -1,14 +1,13 @@
 package com.android.launcher;
 
-import com.android.launcher.*;
 import android.app.Activity;
 import android.content.Context;
-import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Bundle;
-import android.util.Log;
+import android.widget.CompoundButton;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.CheckBox;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 
 public class ExtendedHomeSettings extends Activity {
@@ -21,6 +20,9 @@ public class ExtendedHomeSettings extends Activity {
 	
 	TextView TextViewDefaultHomeScreenNr;
 	TextView TextViewHomeScreensNr;
+	
+	//irrenhaus
+	CheckBox CheckBoxCloseFolders;
 	
 	int MIN_SCREENS = 2;
 	
@@ -45,6 +47,10 @@ public class ExtendedHomeSettings extends Activity {
 
         TextViewDefaultHomeScreenNr.setText(String.valueOf(com.android.launcher.Extended.Data.ExtendedSettings.Home_DefaultScreen(context.getApplicationContext())+1));
         TextViewHomeScreensNr.setText(String.valueOf(com.android.launcher.Extended.Data.ExtendedSettings.Home_HomeScreens(context.getApplicationContext())));
+        
+        // irrenhaus
+        CheckBoxCloseFolders = (CheckBox)findViewById(R.id.CheckBoxCloseFolders);
+        CheckBoxCloseFolders.setChecked(com.android.launcher.Extended.Data.ExtendedSettings.Home_CloseFolders(context.getApplicationContext()));
         
         SeekBarHomeScreens.setOnSeekBarChangeListener(new OnSeekBarChangeListener()
         {
@@ -97,6 +103,16 @@ public class ExtendedHomeSettings extends Activity {
 				// TODO Auto-generated method stub
 				
 			}});
+	    
+	    // irrenhaus
+	    CheckBoxCloseFolders.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+
+			public void onCheckedChanged(CompoundButton buttonView,
+					boolean isChecked) {
+				com.android.launcher.Extended.Data.ExtendedSettings.Set_Home_CloseFolders(context.getApplicationContext(), isChecked);
+			}
+	    	
+	    });
     
     }    
 }

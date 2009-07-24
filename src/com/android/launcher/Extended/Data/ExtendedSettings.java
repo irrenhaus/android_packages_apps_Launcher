@@ -46,6 +46,25 @@ public final class ExtendedSettings {
         
         return screen;
 	}
+	// irrenhaus
+	public static boolean Home_CloseFolders(Context context)
+	{
+		SQLiteDatabase mDatabase;
+		ExtendedHomeDBHelper hlp = new ExtendedHomeDBHelper(context);
+		mDatabase = hlp.getWritableDatabase();
+		
+        Cursor eCursor = mDatabase.query(false, "extendedhome", new String[] { "closefolders" }, "name='home'", null, null, null, null, null);
+        eCursor.moveToFirst();
+        
+        int close = eCursor.getInt(0);
+        
+        eCursor.close();
+        mDatabase.close();
+        
+        if(close != 0)
+        	return true;
+        return false;
+	}
 	public static void Set_Home_HomeScreens(Context context, int Screens)
 	{
 		SQLiteDatabase mDatabase;
@@ -73,6 +92,27 @@ public final class ExtendedSettings {
         mDatabase.close();
         
         Log.d(Tag, "Default homescreen set to "+Screen);
+	}
+	
+	// irrenhaus
+	public static void Set_Home_CloseFolders(Context context, boolean close)
+	{
+		SQLiteDatabase mDatabase;
+		ExtendedHomeDBHelper hlp = new ExtendedHomeDBHelper(context);
+		mDatabase = hlp.getWritableDatabase();
+		
+        ContentValues updateValues = new ContentValues();
+        
+        int value = 0;
+        if(close)
+        	value = 1;
+        
+        updateValues.put("closefolders", value);
+        
+        mDatabase.update("extendedhome", updateValues, "name='home'", null);
+        mDatabase.close();
+        
+        Log.d(Tag, "Default homescreen set to "+close);
 	}
 
     public static int Sensor_Enabled(Context context)
@@ -115,10 +155,10 @@ public final class ExtendedSettings {
 
 		@Override
 		public void onCreate(SQLiteDatabase db) {
-			String ddlScripts = "create table extendedhome (name text, screens integer, defaultscreen integer);";
+			String ddlScripts = "create table extendedhome (name text, screens integer, defaultscreen integer, closefolders integer);";
 			db.execSQL(ddlScripts);
 			
-			ddlScripts = "insert into extendedhome (name, screens, defaultscreen) values ('home', 3, 1);";
+			ddlScripts = "insert into extendedhome (name, screens, defaultscreen, closefolders) values ('home', 3, 1, 1);";
 			db.execSQL(ddlScripts);
 			
 		}
