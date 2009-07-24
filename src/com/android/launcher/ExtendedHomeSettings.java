@@ -38,19 +38,19 @@ public class ExtendedHomeSettings extends Activity {
         TextViewHomeScreensNr = (TextView)findViewById(R.id.TextViewHomeScreensNr);
         
         SeekBarHomeScreens = (SeekBar)findViewById(R.id.SeekBarHomeScreens);
-        SeekBarHomeScreens.setProgress(com.android.launcher.Extended.Data.ExtendedSettings.Home_HomeScreens(context.getApplicationContext())-MIN_SCREENS);
+        SeekBarHomeScreens.setProgress(com.android.launcher.extended.data.ExtendedSettings.Home_HomeScreens(context.getApplicationContext())-MIN_SCREENS);
 
         SeekBarDefaultHomeScreen = (SeekBar)findViewById(R.id.SeekBarDefaultHomeScreen);
         
-        SeekBarDefaultHomeScreen.setMax(com.android.launcher.Extended.Data.ExtendedSettings.Home_HomeScreens(context.getApplicationContext())-1);
-        SeekBarDefaultHomeScreen.setProgress(com.android.launcher.Extended.Data.ExtendedSettings.Home_DefaultScreen(context.getApplicationContext()));
+        SeekBarDefaultHomeScreen.setMax(com.android.launcher.extended.data.ExtendedSettings.Home_HomeScreens(context.getApplicationContext())-1);
+        SeekBarDefaultHomeScreen.setProgress(com.android.launcher.extended.data.ExtendedSettings.Home_DefaultScreen(context.getApplicationContext()));
 
-        TextViewDefaultHomeScreenNr.setText(String.valueOf(com.android.launcher.Extended.Data.ExtendedSettings.Home_DefaultScreen(context.getApplicationContext())+1));
-        TextViewHomeScreensNr.setText(String.valueOf(com.android.launcher.Extended.Data.ExtendedSettings.Home_HomeScreens(context.getApplicationContext())));
+        TextViewDefaultHomeScreenNr.setText(String.valueOf(com.android.launcher.extended.data.ExtendedSettings.Home_DefaultScreen(context.getApplicationContext())+1));
+        TextViewHomeScreensNr.setText(String.valueOf(com.android.launcher.extended.data.ExtendedSettings.Home_HomeScreens(context.getApplicationContext())));
         
         // irrenhaus
         CheckBoxCloseFolders = (CheckBox)findViewById(R.id.CheckBoxCloseFolders);
-        CheckBoxCloseFolders.setChecked(com.android.launcher.Extended.Data.ExtendedSettings.Home_CloseFolders(context.getApplicationContext()));
+        CheckBoxCloseFolders.setChecked(com.android.launcher.extended.data.ExtendedSettings.Home_CloseFolders(context.getApplicationContext()));
         
         SeekBarHomeScreens.setOnSeekBarChangeListener(new OnSeekBarChangeListener()
         {
@@ -59,15 +59,15 @@ public class ExtendedHomeSettings extends Activity {
 					boolean fromUser) {
 				// TODO Auto-generated method stub
 				
-				com.android.launcher.Extended.Data.ExtendedSettings.Set_Home_HomeScreens(context.getApplicationContext(), progress + MIN_SCREENS);
+				com.android.launcher.extended.data.ExtendedSettings.Set_Home_HomeScreens(context.getApplicationContext(), progress + MIN_SCREENS);
 				
 				TextViewHomeScreensNr.setText(String.valueOf(progress+MIN_SCREENS));
-				SeekBarDefaultHomeScreen.setMax(com.android.launcher.Extended.Data.ExtendedSettings.Home_HomeScreens(context.getApplicationContext())-1);
+				SeekBarDefaultHomeScreen.setMax(com.android.launcher.extended.data.ExtendedSettings.Home_HomeScreens(context.getApplicationContext())-1);
 				
-				if(com.android.launcher.Extended.Data.ExtendedSettings.Home_DefaultScreen(context.getApplicationContext()) > (com.android.launcher.Extended.Data.ExtendedSettings.Home_HomeScreens(context.getApplicationContext())-1))
+				if(com.android.launcher.extended.data.ExtendedSettings.Home_DefaultScreen(context.getApplicationContext()) > (com.android.launcher.extended.data.ExtendedSettings.Home_HomeScreens(context.getApplicationContext())-1))
 				{
-					com.android.launcher.Extended.Data.ExtendedSettings.Set_Home_DefaultScreen(context.getApplicationContext(), (com.android.launcher.Extended.Data.ExtendedSettings.Home_HomeScreens(context.getApplicationContext())-1));
-					TextViewDefaultHomeScreenNr.setText(String.valueOf(com.android.launcher.Extended.Data.ExtendedSettings.Home_HomeScreens(context.getApplicationContext())));
+					com.android.launcher.extended.data.ExtendedSettings.Set_Home_DefaultScreen(context.getApplicationContext(), (com.android.launcher.extended.data.ExtendedSettings.Home_HomeScreens(context.getApplicationContext())-1));
+					TextViewDefaultHomeScreenNr.setText(String.valueOf(com.android.launcher.extended.data.ExtendedSettings.Home_HomeScreens(context.getApplicationContext())));
 
 				}
 				
@@ -90,7 +90,7 @@ public class ExtendedHomeSettings extends Activity {
 					boolean fromUser) {
 				// TODO Auto-generated method stub
 				
-				com.android.launcher.Extended.Data.ExtendedSettings.Set_Home_DefaultScreen(context.getApplicationContext(), progress);
+				com.android.launcher.extended.data.ExtendedSettings.Set_Home_DefaultScreen(context.getApplicationContext(), progress);
 				TextViewDefaultHomeScreenNr.setText(String.valueOf(progress+1));
 			}
 	
@@ -109,7 +109,7 @@ public class ExtendedHomeSettings extends Activity {
 
 			public void onCheckedChanged(CompoundButton buttonView,
 					boolean isChecked) {
-				com.android.launcher.Extended.Data.ExtendedSettings.Set_Home_CloseFolders(context.getApplicationContext(), isChecked);
+				com.android.launcher.extended.data.ExtendedSettings.Set_Home_CloseFolders(context.getApplicationContext(), isChecked);
 			}
 	    	
 	    });

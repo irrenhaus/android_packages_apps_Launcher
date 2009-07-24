@@ -30,7 +30,7 @@ public class ExtendedSensorSettings extends Activity {
     
         CheckBox CheckBoxSensorRotation = (CheckBox)findViewById(R.id.CheckBoxSensorRotation);
         
-        if(com.android.launcher.Extended.Data.ExtendedSettings.Sensor_Enabled(context)==1)
+        if(com.android.launcher.extended.data.ExtendedSettings.Sensor_Enabled(context)==1)
         {
         	CheckBoxSensorRotation.setChecked(true);
         } else {
@@ -44,9 +44,9 @@ public class ExtendedSensorSettings extends Activity {
 
 				if(isChecked)
 				{
-					com.android.launcher.Extended.Data.ExtendedSettings.Set_Sensor_Enabled(context, 1);
+					com.android.launcher.extended.data.ExtendedSettings.Set_Sensor_Enabled(context, 1);
 				} else {
-					com.android.launcher.Extended.Data.ExtendedSettings.Set_Sensor_Enabled(context, 0);
+					com.android.launcher.extended.data.ExtendedSettings.Set_Sensor_Enabled(context, 0);
 				}
 
 				

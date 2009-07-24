@@ -1,4 +1,4 @@
-package com.android.launcher.Extended.Display;
+package com.android.launcher.extended.display;
 
 import java.util.ArrayList;
 

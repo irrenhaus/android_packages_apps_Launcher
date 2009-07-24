@@ -61,7 +61,7 @@ public class LiveFolder extends Folder {
                 mLauncher.startActivitySafely(intent);
                 
                 //irrenhaus
-                if(com.android.launcher.Extended.Data.ExtendedSettings.Home_CloseFolders(parent.getContext().getApplicationContext()))
+                if(com.android.launcher.extended.data.ExtendedSettings.Home_CloseFolders(parent.getContext().getApplicationContext()))
                 {
 	                // Close the folder when an app is started
 	                mLauncher.closeFolder(this);
