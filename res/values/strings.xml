@@ -135,4 +135,7 @@
     <string name="menu_extended_sensor">Extended Sensor</string>
     <string name="menu_extended_sensor_info">Enable sensor-based rotation for the home screen</string> 
 
+	<!-- Close Folders on App start / irrenhaus -->
+	<string name="menu_extended_close_folders">Close Desktop-Folders on App start</string>
+	
 </resources>

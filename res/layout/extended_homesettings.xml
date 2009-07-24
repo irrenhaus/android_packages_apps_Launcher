@@ -20,4 +20,7 @@
 </LinearLayout>
 
 <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_margin="20px" android:text="@string/menu_extended_home_info"></TextView>
+
+<CheckBox android:id="@+id/CheckBoxCloseFolders" android:layout_width="wrap_content" android:layout_height="wrap_content"  android:layout_margin="20px" android:text="@string/menu_extended_close_folders"/>
+
 </LinearLayout>
