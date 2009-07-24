@@ -2,7 +2,7 @@ package com.android.launcher;
 
 import java.util.ArrayList;
 
-import com.android.launcher.Extended.Display.*;
+import com.android.launcher.extended.display.*;
 
 import android.app.Activity;
 import android.content.Intent;

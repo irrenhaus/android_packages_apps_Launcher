@@ -139,8 +139,8 @@ public class Workspace extends ViewGroup implements DropTarget, DragSource, Drag
         TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.Workspace, defStyle, 0);
 
         /* Rogro82@xda Extended : Load the default and number of homescreens from the settings database */
-        mDefaultScreen = com.android.launcher.Extended.Data.ExtendedSettings.Home_DefaultScreen(context);
-        mHomeScreens = com.android.launcher.Extended.Data.ExtendedSettings.Home_HomeScreens(context.getApplicationContext());
+        mDefaultScreen = com.android.launcher.extended.data.ExtendedSettings.Home_DefaultScreen(context);
+        mHomeScreens = com.android.launcher.extended.data.ExtendedSettings.Home_HomeScreens(context.getApplicationContext());
 
         a.recycle();
 

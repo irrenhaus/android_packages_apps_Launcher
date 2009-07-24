@@ -1,4 +1,4 @@
-package com.android.launcher.Extended.Data;
+package com.android.launcher.extended.data;
 
 import android.app.Activity;
 import android.content.ContentValues;
