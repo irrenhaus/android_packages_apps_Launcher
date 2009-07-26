@@ -16,12 +16,23 @@
 
 package com.android.launcher;
 
+import static android.util.Log.d;
+import static android.util.Log.w;
+
+import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.LinkedList;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Application;
 import android.app.Dialog;
+import android.app.IWallpaperService;
 import android.app.SearchManager;
 import android.app.StatusBarManager;
+import android.appwidget.AppWidgetHost;
+import android.appwidget.AppWidgetManager;
+import android.appwidget.AppWidgetProviderInfo;
 import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -35,8 +46,8 @@ import android.content.Intent.ShortcutIconResource;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
-import android.content.res.Resources;
 import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.database.ContentObserver;
 import android.graphics.Bitmap;
 import android.graphics.Rect;
@@ -48,19 +59,19 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
+import android.os.Message;
 import android.os.MessageQueue;
 import android.os.Parcelable;
 import android.os.RemoteException;
 import android.os.ServiceManager;
-import android.os.Message;
-import android.provider.*;
+import android.provider.Contacts;
+import android.provider.LiveFolders;
 import android.telephony.PhoneNumberUtils;
 import android.text.Selection;
 import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
 import android.text.method.TextKeyListener;
 import android.util.Log;
-import static android.util.Log.*;
 import android.view.Display;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -71,17 +82,10 @@ import android.view.ViewGroup;
 import android.view.View.OnLongClickListener;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
-import android.widget.TextView;
-import android.widget.Toast;
 import android.widget.GridView;
 import android.widget.SlidingDrawer;
-import android.app.IWallpaperService;
-import android.appwidget.AppWidgetManager;
-import android.appwidget.AppWidgetProviderInfo;
-
-import java.lang.ref.WeakReference;
-import java.util.ArrayList;
-import java.util.LinkedList;
+import android.widget.TextView;
+import android.widget.Toast;
 
 /**
  * Default launcher application.
@@ -104,6 +108,7 @@ public final class Launcher extends Activity implements View.OnClickListener, On
     private static final int MENU_NOTIFICATIONS = MENU_SEARCH + 1;
     private static final int MENU_SETTINGS = MENU_NOTIFICATIONS + 1;
     private static final int MENU_EXTENDED = MENU_SETTINGS + 1;
+    private static final int MENU_SUBMENU = MENU_EXTENDED + 1;
 
     private static final int REQUEST_CREATE_SHORTCUT = 1;
     private static final int REQUEST_CREATE_LIVE_FOLDER = 4;
@@ -246,6 +251,9 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 
         /* Rogro82@xda Extended : expose active launcher */
         ExtendedDrawerSettings.activeLauncher = this;
+        
+        // irrenhaus@xda: expose active launcher
+        SubMenuSettings.activeLauncher = this;
 
         /* Rogro82@xda Extended : check and possibly disable auto-rotate */
         if(com.android.launcher.extended.data.ExtendedSettings.Sensor_Enabled(this.getApplicationContext())==0) {
@@ -889,6 +897,13 @@ public final class Launcher extends Activity implements View.OnClickListener, On
                 .setIcon(android.R.drawable.ic_menu_preferences).setAlphabeticShortcut('D')
                 .setIntent(extendedsettings);
 
+        //irrenhaus@xda Submenu settings
+
+        final Intent submenusettings = new Intent(Launcher.this, SubMenuSettings.class);
+        menu.add(0, MENU_SUBMENU, 0, R.string.menu_submenu)
+                .setIcon(android.R.drawable.ic_menu_preferences).setAlphabeticShortcut('S')
+                .setIntent(submenusettings);
+        
         return true;
     }
 
