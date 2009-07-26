@@ -2,17 +2,16 @@ package com.android.launcher;
 
 import java.util.ArrayList;
 
-import com.android.launcher.extended.display.*;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
+
+import com.android.launcher.extended.display.MenuAdapter;
+import com.android.launcher.extended.display.MenuItem;
 
 public class ExtendedSettings extends Activity {
 

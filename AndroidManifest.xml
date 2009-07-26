@@ -86,6 +86,10 @@
     	<activity android:name="ExtendedHomeSettings" android:label="@string/menu_extended_home" />
         <activity android:name="ExtendedSensorSettings" android:label="@string/menu_extended_sensor" />
 
+
+	    <activity android:name="SubMenuSettings" android:label="@string/menu_submenu" />
+	    <activity android:name="SubMenu" android:label="SubMenu" />
+
         <activity
             android:name="WallpaperChooser"
             android:label="@string/pick_wallpaper"

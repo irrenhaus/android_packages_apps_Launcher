@@ -16,36 +16,39 @@
 
 package com.android.launcher;
 
+import static android.util.Log.d;
+import static android.util.Log.e;
+import static android.util.Log.w;
+
+import java.lang.ref.WeakReference;
+import java.net.URISyntaxException;
+import java.text.Collator;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+
 import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.ContentValues;
-import android.content.Intent;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
+import android.database.sqlite.SQLiteException;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import static android.util.Log.*;
 import android.os.Process;
 import android.util.Log;
-import android.widget.Toast;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Comparator;
-import java.lang.ref.WeakReference;
-import java.text.Collator;
-import java.net.URISyntaxException;
 
 import com.android.launcher.ExtendedDrawerSettings.ExtendedDrawerDBHelper;
+import com.android.launcher.SubMenuSettings.SubMenuDBHelper;
 
 /**
  * Maintains in-memory state of the Launcher. It is expected that there should be only one
@@ -500,6 +503,9 @@ public class LauncherModel {
 
         /* Rogro82@xda Extended : check for applications in extendeddrawer_hidden database */
         SQLiteDatabase mDatabase;
+        
+        //irrenhaus@xda: submenus db
+        SQLiteDatabase msmDatabase;
 
         public void run() {
             mRunning = true;
@@ -525,9 +531,63 @@ public class LauncherModel {
                 ChangeNotifier action = new ChangeNotifier(applicationList, true);
                 final HashMap<ComponentName, ApplicationInfo> appInfoCache = mAppInfoCache;
                 
-                ExtendedDrawerDBHelper hlp = new ExtendedDrawerDBHelper(launcher.getApplicationContext()); 
+                Context context = launcher.getApplicationContext();
+                
+                ExtendedDrawerDBHelper hlp = new ExtendedDrawerDBHelper(context); 
                 mDatabase = hlp.getWritableDatabase();
+                SubMenuDBHelper subhlp = new SubMenuDBHelper(context);
+                msmDatabase = subhlp.getWritableDatabase();
 
+            	Log.d("SubMenu", "Loaded db "+msmDatabase.getPath());
+            	Log.d("SubMenu", "Other db is "+mDatabase.getPath());
+                
+                if(msmDatabase.isOpen())
+                {
+                	Log.d("SubMenu", "DB opened!");
+                	
+                	
+                }
+
+                //irrenhaus@xda: get submenus and add them to the menu
+                try {
+	                Cursor subMenus = msmDatabase.query(false, "submenus", new String[] { "_id", "name" }, null, null, null, null, null, null);
+	                
+	                Log.d("SubMenu", "CursorCount: "+subMenus.getCount());
+	                
+	                Cursor tmp = msmDatabase.rawQuery("SELECT count(*) FROM submenus", null);
+	                while(tmp.moveToNext())
+	                	Log.d("SubMenu", "DBCount: "+tmp.getString(0));
+	                
+	                while(subMenus.moveToNext() && !mStopped)
+	                {
+	                	ApplicationInfo info = new ApplicationInfo();
+	                	info.container = ApplicationInfo.NO_ID;
+	                	info.itemType = LauncherSettings.Favorites.ITEM_TYPE_SHORTCUT;
+	                	info.title = subMenus.getString(subMenus.getColumnIndex("name"));
+	                	info.id = subMenus.getInt(subMenus.getColumnIndex("_id"));
+	                	info.icon = context.getResources().getDrawable(R.drawable.ic_launcher_folder);
+	                	
+	                	Intent launchIntent = new Intent(Intent.ACTION_MAIN);
+	                    launchIntent.setClass(context, SubMenu.class);
+	                    launchIntent.putExtra("com.android.launcher.Extended.SubMenu", info.title);
+	                	
+	                	info.intent = launchIntent;
+
+                		Log.d("SubMenu", "Adding..."+info.title);
+	                	if (action.add(info) && !mStopped) {
+	                		Log.d("SubMenu", "Added! "+info.title);
+	                        launcher.runOnUiThread(action);
+	                        action = new ChangeNotifier(applicationList, false);
+	                    }
+	                }
+	                
+	                subMenus.close();
+                }
+                catch (SQLiteException e)
+                {
+                	Log.d("SubMenu", e.getMessage());
+                }
+                
                 for (int i = 0; i < count && !mStopped; i++) {
                     ResolveInfo info = apps.get(i);
                     ApplicationInfo application =
@@ -535,18 +595,39 @@ public class LauncherModel {
 
                     Cursor eCursor = mDatabase.query(false, "extendeddrawer_hidden", new String[] { "_id", "name", "intent" }, "intent='" + application.intent.toURI() + "'", null, null, null, null, null);
                     
+                    //irrenhaus@xda: check if it should be in the main menu
+                    Cursor sub = null;
+                    try {
+                    sub = msmDatabase.query(false, "submenus_entries", new String[] { "_id", "name", "intent", "submenu" }, "intent='" + application.intent.toURI() + "'", null, null, null, null, null);
+                    } catch(SQLiteException e) {
+                    	Log.d("SubMenu", e.getMessage());
+                    }
+                    String subMenu = null;
+                    
                     //Only show if its not in the appdrawer table
                     if(eCursor.getCount()==0) {
-                        if (action.add(application) && !mStopped) {
+                    	//irrenhaus@xda: check for submenu. if it is not in the db, add it to main menu
+                    	if(sub != null && sub.getCount() > 0)
+                    	{
+                    		while(sub.moveToNext() && !mStopped)
+                    		{
+                    			subMenu = sub.getString(sub.getColumnIndex("submenu"));
+                    		}
+                        }
+                    	
+                    	if ((subMenu == null || subMenu.equals("MainMenu")) && action.add(application) && !mStopped) {
                             launcher.runOnUiThread(action);
                             action = new ChangeNotifier(applicationList, false);
                         }
                     }
 
                     eCursor.close();
+                    sub.close();
                 }
 
+                
                 mDatabase.close();
+                msmDatabase.close();
                 launcher.runOnUiThread(action);
             }
 

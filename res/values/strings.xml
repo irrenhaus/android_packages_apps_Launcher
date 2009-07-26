@@ -138,4 +138,7 @@
 	<!-- Close Folders on App start / irrenhaus -->
 	<string name="menu_extended_close_folders">Close Desktop-Folders on App start</string>
 	
+	<!-- irrenhaus@xda: Submenu settings -->
+	<string name="menu_submenu">Submenus</string>
+	
 </resources>
