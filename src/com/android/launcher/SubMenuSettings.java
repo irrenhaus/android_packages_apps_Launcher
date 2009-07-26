@@ -53,7 +53,8 @@ public class SubMenuSettings extends ListActivity {
 	{
 		if(item.getTitle().equals("Add submenu"))
 		{
-			AddMenu("test");
+			Intent intent = new Intent(this, SubMenuManageMenusSettings.class);
+			startActivity(intent);
 		}
 		
 		return super.onOptionsItemSelected(item);
