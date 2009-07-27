@@ -11,12 +11,13 @@ import android.util.Log;
 
 public final class ExtendedSettings {
 
-	public static final String PreferenceName = "LauncherExtended";
-	public static final String Tag = "ExtendedHome";
+	public static final String preferenceName = "extendedlauncher";
+	public static final String homeTag = "home_";
+	public static final String sensorTag = "sensor_";
 	
 	public static int Home_HomeScreens(Context context)
 	{
-		SQLiteDatabase mDatabase;
+		/*SQLiteDatabase mDatabase;
 		ExtendedHomeDBHelper hlp = new ExtendedHomeDBHelper(context);
 		mDatabase = hlp.getWritableDatabase();
 		
@@ -26,13 +27,17 @@ public final class ExtendedSettings {
         int screens = eCursor.getInt(0);
         
         eCursor.close();
-        mDatabase.close();
+        mDatabase.close();*/
+        
+        SharedPreferences prefs = context.getSharedPreferences(preferenceName, 0);
+        
+        int screens = prefs.getInt(homeTag+"screens", 3);
         
         return screens;
 	}
 	public static int Home_DefaultScreen(Context context)
 	{
-		SQLiteDatabase mDatabase;
+		/*SQLiteDatabase mDatabase;
 		ExtendedHomeDBHelper hlp = new ExtendedHomeDBHelper(context);
 		mDatabase = hlp.getWritableDatabase();
 		
@@ -42,14 +47,18 @@ public final class ExtendedSettings {
         int screen = eCursor.getInt(0);
         
         eCursor.close();
-        mDatabase.close();
+        mDatabase.close();*/
+        
+        SharedPreferences prefs = context.getSharedPreferences(preferenceName, 0);
+        
+        int screen = prefs.getInt(homeTag+"defaultscreen", 2);
         
         return screen;
 	}
 	// irrenhaus
 	public static boolean Home_CloseFolders(Context context)
 	{
-		SQLiteDatabase mDatabase;
+		/*SQLiteDatabase mDatabase;
 		ExtendedHomeDBHelper hlp = new ExtendedHomeDBHelper(context);
 		mDatabase = hlp.getWritableDatabase();
 		
@@ -59,7 +68,11 @@ public final class ExtendedSettings {
         int close = eCursor.getInt(0);
         
         eCursor.close();
-        mDatabase.close();
+        mDatabase.close();*/
+        
+        SharedPreferences prefs = context.getSharedPreferences(preferenceName, 0);
+        
+        int close = prefs.getInt(homeTag+"closefolders", 1);
         
         if(close != 0)
         	return true;
@@ -67,7 +80,7 @@ public final class ExtendedSettings {
 	}
 	public static void Set_Home_HomeScreens(Context context, int Screens)
 	{
-		SQLiteDatabase mDatabase;
+		/*SQLiteDatabase mDatabase;
 		ExtendedHomeDBHelper hlp = new ExtendedHomeDBHelper(context);
 		mDatabase = hlp.getWritableDatabase();
 		
@@ -75,13 +88,20 @@ public final class ExtendedSettings {
         updateValues.put("screens", Screens);
         
         mDatabase.update("extendedhome", updateValues, "name='home'", null);
-        mDatabase.close();
+        mDatabase.close();*/
+		
+		SharedPreferences prefs = context.getSharedPreferences(preferenceName, 0);
+		SharedPreferences.Editor edit = prefs.edit();
+		
+		edit.putInt(homeTag+"screens", Screens);
+		
+		edit.commit();
         
-        Log.d(Tag, "Number of homescreens set to "+Screens);
+        Log.d(homeTag, "Number of homescreens set to "+Screens);
 	}
 	public static void Set_Home_DefaultScreen(Context context, int Screen)
 	{
-		SQLiteDatabase mDatabase;
+		/*SQLiteDatabase mDatabase;
 		ExtendedHomeDBHelper hlp = new ExtendedHomeDBHelper(context);
 		mDatabase = hlp.getWritableDatabase();
 		
@@ -89,15 +109,22 @@ public final class ExtendedSettings {
         updateValues.put("defaultscreen", Screen);
         
         mDatabase.update("extendedhome", updateValues, "name='home'", null);
-        mDatabase.close();
+        mDatabase.close();*/
+		
+		SharedPreferences prefs = context.getSharedPreferences(preferenceName, 0);
+		SharedPreferences.Editor edit = prefs.edit();
+		
+		edit.putInt(homeTag+"defaultscreen", Screen);
+		
+		edit.commit();
         
-        Log.d(Tag, "Default homescreen set to "+Screen);
+        Log.d(homeTag, "Default homescreen set to "+Screen);
 	}
 	
 	// irrenhaus
 	public static void Set_Home_CloseFolders(Context context, boolean close)
 	{
-		SQLiteDatabase mDatabase;
+		/*SQLiteDatabase mDatabase;
 		ExtendedHomeDBHelper hlp = new ExtendedHomeDBHelper(context);
 		mDatabase = hlp.getWritableDatabase();
 		
@@ -110,14 +137,24 @@ public final class ExtendedSettings {
         updateValues.put("closefolders", value);
         
         mDatabase.update("extendedhome", updateValues, "name='home'", null);
-        mDatabase.close();
+        mDatabase.close();*/
+		
+		SharedPreferences prefs = context.getSharedPreferences(preferenceName, 0);
+		SharedPreferences.Editor edit = prefs.edit();
+		
+		if(close)
+			edit.putInt(homeTag+"closefolders", 1);
+		else
+			edit.putInt(homeTag+"closefolders", 0);
+		
+		edit.commit();
         
-        Log.d(Tag, "Default homescreen set to "+close);
+        Log.d(homeTag, "Default homescreen set to "+close);
 	}
 
     public static int Sensor_Enabled(Context context)
     {
-        SQLiteDatabase mDatabase;
+        /*SQLiteDatabase mDatabase;
         ExtendedSensorDBHelper hlp = new ExtendedSensorDBHelper(context);
         mDatabase = hlp.getWritableDatabase();
 
@@ -127,14 +164,18 @@ public final class ExtendedSettings {
         int enabled = eCursor.getInt(0);
 
         eCursor.close();
-        mDatabase.close();
+        mDatabase.close();*/
+        
+        SharedPreferences prefs = context.getSharedPreferences(preferenceName, 0);
+        
+        int enabled = prefs.getInt(sensorTag+"sensorenabled", 1);
 
         return enabled;
     }
 
     public static void Set_Sensor_Enabled(Context context, int Enabled)
     {
-        SQLiteDatabase mDatabase;
+        /*SQLiteDatabase mDatabase;
         ExtendedSensorDBHelper hlp = new ExtendedSensorDBHelper(context);
         mDatabase = hlp.getWritableDatabase();
 
@@ -142,9 +183,16 @@ public final class ExtendedSettings {
         updateValues.put("sensorenabled", Enabled);
 
         mDatabase.update("extendedsensor", updateValues, "name='rotation'", null);
-        mDatabase.close();
+        mDatabase.close();*/
+		
+		SharedPreferences prefs = context.getSharedPreferences(preferenceName, 0);
+		SharedPreferences.Editor edit = prefs.edit();
+		
+		edit.putInt(sensorTag+"sensorenabled", Enabled);
+		
+		edit.commit();
 
-        Log.d(Tag, "Sensor-based rotation set to " + Enabled);
+        Log.d(sensorTag, "Sensor-based rotation set to " + Enabled);
     }
 
 	/** Database */

@@ -28,11 +28,13 @@ public class SubMenuAddMenu extends Activity {
 				Intent intent = new Intent();
 				intent.putExtra("com.android.launcher.AddSubMenu", menuName.getText().toString());
 				SubMenuAddMenu.this.setResult(0, intent);
+				SubMenuAddMenu.this.finish();
 			}
 		});
 		
 		buttonCancel.setOnClickListener(new OnClickListener()  {
 			public void onClick(View v) {
+				SubMenuAddMenu.this.setResult(1);
 				SubMenuAddMenu.this.finish();
 			}
 		});

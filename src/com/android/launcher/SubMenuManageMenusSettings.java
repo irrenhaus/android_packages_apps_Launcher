@@ -1,9 +1,12 @@
 package com.android.launcher;
 
+import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.DialogInterface.OnClickListener;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
@@ -17,9 +20,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.View.OnCreateContextMenuListener;
+import android.widget.AdapterView;
 import android.widget.CursorAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.AdapterView.OnItemLongClickListener;
 
 import com.android.launcher.SubMenuSettings.SubMenuDBHelper;
 
@@ -32,26 +37,34 @@ public class SubMenuManageMenusSettings extends ListActivity {
 	private final static int	mFirstEntry = Menu.FIRST+1;
 	
 	@Override
-	public boolean onContextItemSelected(MenuItem item)
+	public boolean onCreateOptionsMenu(Menu menu)
 	{
-		if(item.getItemId() == mFirstEntry) //add menu
+		menu.add("Add menu");
+		
+		return super.onCreateOptionsMenu(menu);
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item)
+	{
+		if(item.getTitle().equals("Add menu"))
 		{
 			Intent intent = new Intent(this, SubMenuAddMenu.class);
 			this.startActivityForResult(intent, 0);
 		}
-		else if(item.getItemId() == mFirstEntry+1) //delete menu
-		{
-			
-		}
 		
-		return super.onContextItemSelected(item);
+		return super.onOptionsItemSelected(item);
 	}
 	
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data)
 	{
+		if(resultCode != 0 || data == null)
+			return;
+		
 		AddMenu(data.getStringExtra("com.android.launcher.AddSubMenu"));
 		refreshCursor();
+		SubMenuSettings.refreshMenuList(mDatabase);
 	}
 	
 	void AddMenu(String title)
@@ -60,6 +73,22 @@ public class SubMenuManageMenusSettings extends ListActivity {
 		values.put("name", title);
 		
 		mDatabase.insert("submenus", null, values);
+		
+		refreshCursor();
+		
+        final LauncherModel model = Launcher.getModel();
+
+        model.dropApplications();
+        model.loadApplications(false, SubMenuSettings.activeLauncher, false);
+	}
+	
+	void DeleteMenu(String title)
+	{
+		ContentValues values = new ContentValues();
+		values.put("submenu", "MainMenu");
+		
+		mDatabase.update("submenus_entries", values, "submenu = '"+title+"'", null);
+		mDatabase.delete("submenus", "name = '"+title+"'", null);
 		
 		refreshCursor();
 		
@@ -106,17 +135,35 @@ public class SubMenuManageMenusSettings extends ListActivity {
 
         refreshCursor();
         
-        mListView.setOnCreateContextMenuListener(
-        		new OnCreateContextMenuListener()
-        		{
-					public void onCreateContextMenu(ContextMenu menu, View v,
-							ContextMenuInfo menuInfo) {
-
-						menu.add(0, mFirstEntry, 0, "Add new menu");
-						//menu.add(0, mFirstEntry+1, 0, "Delete menu");
+        mListView.setOnItemLongClickListener(new OnItemLongClickListener() {
+			public boolean onItemLongClick(AdapterView<?> parent, View view,
+					int position, long id) {
+				
+				mCursor.moveToPosition(position);
+				final String name = mCursor.getString(1);
+						
+				AlertDialog.Builder builder = new AlertDialog.Builder(SubMenuManageMenusSettings.this);
+				
+				builder.setMessage("Delete this submenu?");
+				builder.setPositiveButton("Delete", new OnClickListener() {
+					public void onClick(DialogInterface dialog, int which) {
+						Log.d("SubMenuManageMenus", "Trying to delete "+name);
+						DeleteMenu(name);
 					}
-        		}
-        );
+				});
+				builder.setNegativeButton("Cancel", new OnClickListener() {
+					public void onClick(DialogInterface dialog, int which) {
+						
+					}
+				});
+				
+				AlertDialog alert = builder.create();
+				
+				alert.show();
+				
+				return false;
+			}
+        });
 	}
 	
 	@Override
