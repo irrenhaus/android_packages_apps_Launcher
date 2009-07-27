@@ -87,9 +87,6 @@ public class SubMenuSettings extends ListActivity {
 			i++;
 		}
 		
-		refreshCursor();
-		refreshMenuList(mDatabase);
-		
     	return super.onContextItemSelected(item);
     }
 	
@@ -198,6 +195,8 @@ public class SubMenuSettings extends ListActivity {
         		{
 					public void onCreateContextMenu(ContextMenu menu, View v,
 							ContextMenuInfo menuInfo) {
+						
+						refreshMenuList(mDatabase);
 
 						menu.add(0, mnuMoveItem, 0, "Add to main menu");
 
