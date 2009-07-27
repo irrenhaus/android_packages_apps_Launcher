@@ -54,16 +54,24 @@ public class SubMenuAdapter extends ArrayAdapter<ApplicationInfo> {
 		
 		Cursor data = db.query("submenus_entries", new String[] {"_id", "name", "intent", "submenu"}, "submenu = '"+title+"'", null, null, null, null);
 		
+		final Intent mainIntent = new Intent(Intent.ACTION_MAIN, null);
+        mainIntent.addCategory(Intent.CATEGORY_LAUNCHER);
+		PackageManager manager = context.getPackageManager();
+        final List<ResolveInfo> apps = manager.queryIntentActivities(mainIntent, 0);
+		
 		while(data.moveToNext())
 		{
-			final Intent mainIntent = new Intent(Intent.ACTION_MAIN, null);
-	        mainIntent.addCategory(Intent.CATEGORY_LAUNCHER);
-			PackageManager manager = context.getPackageManager();
-	        final List<ResolveInfo> apps = manager.queryIntentActivities(mainIntent, 0);
-	        
 	        for(int i = 0; i < apps.size(); i++)
 	        {
 	        	ResolveInfo info = apps.get(i);
+	        	
+	        	String apptitle = info.loadLabel(manager).toString();
+	        	if (apptitle == null) {
+	                apptitle = info.activityInfo.name;
+	            }
+	        	
+	        	if(!apptitle.equals(data.getString(data.getColumnIndex("name"))))
+	        		continue;
 	        	
 	        	ComponentName componentName = new ComponentName(
 	                    info.activityInfo.applicationInfo.packageName,
@@ -78,7 +86,10 @@ public class SubMenuAdapter extends ArrayAdapter<ApplicationInfo> {
 	                    Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
 	        	
 	            if(application.title.equals(data.getString(data.getColumnIndex("name"))))
+	            {
 	            	this.add(application);
+	            	break;
+	            }
 	        }
 		}
 		

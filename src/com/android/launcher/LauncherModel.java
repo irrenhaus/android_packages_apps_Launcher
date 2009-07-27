@@ -604,8 +604,6 @@ public class LauncherModel {
                     }
                     String subMenu = null;
                     
-                    Log.d("SubMenu", "Checking for app "+application.title+" sub menu. Count: "+sub.getCount());
-                    
                     //Only show if its not in the appdrawer table
                     if(eCursor.getCount()==0) {
                     	//irrenhaus@xda: check for submenu. if it is not in the db, add it to main menu

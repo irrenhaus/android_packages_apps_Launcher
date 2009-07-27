@@ -90,9 +90,9 @@
 	    <activity android:name="SubMenuSettings" android:label="@string/menu_submenu" />
 	    <activity android:name="SubMenu" android:label="SubMenu" 
     android:theme="@android:style/Theme.Dialog"/>
-	    <activity android:name="SubMenuManageMenusSettings" android:label="SubMenuManageMenusSettings" 
+	    <activity android:name="SubMenuManageMenusSettings" android:label="Manage Menus" 
     android:theme="@android:style/Theme.Dialog"/>
-	    <activity android:name="SubMenuAddMenu" android:label="SubMenuAddMenu" 
+	    <activity android:name="SubMenuAddMenu" android:label="Add Menu" 
     android:theme="@android:style/Theme.Dialog"/>
 
         <activity

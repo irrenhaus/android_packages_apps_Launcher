@@ -3,6 +3,7 @@ package com.android.launcher;
 import java.util.List;
 
 import android.app.ListActivity;
+import android.app.ProgressDialog;
 import android.content.ComponentName;
 import android.content.ContentValues;
 import android.content.Context;
@@ -35,15 +36,17 @@ public class SubMenuSettings extends ListActivity {
 	SQLiteDatabase mDatabase;
 	ApplicationsAdapter mAdapter;
 	ListView mListView;
-	Cursor mCursorSubMenus;
+	private static Cursor mCursorSubMenus;
 	public static Launcher activeLauncher;
 
 	public static final int mnuMoveItem = Menu.FIRST + 1;
+	
+	private ProgressDialog dlg;
 		
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu)
 	{
-		menu.add("Add submenu");
+		menu.add("Manage submenus");
 		
 		return super.onCreateOptionsMenu(menu);
 	}
@@ -51,7 +54,7 @@ public class SubMenuSettings extends ListActivity {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item)
 	{
-		if(item.getTitle().equals("Add submenu"))
+		if(item.getTitle().equals("Manage submenus"))
 		{
 			Intent intent = new Intent(this, SubMenuManageMenusSettings.class);
 			startActivity(intent);
@@ -70,10 +73,8 @@ public class SubMenuSettings extends ListActivity {
 		int ApplicationId = mCursor.getInt(0);
 		String name = mCursor.getString(mCursor.getColumnIndex("name"));
 		
-		if(mCursorSubMenus != null)
-			mCursorSubMenus.close();
-		mCursorSubMenus = mDatabase.query(false, "submenus", new String[] { "_id", "name" }, null, null, null, null, null, null);
-        
+		refreshMenuList(mDatabase);
+		
 		int i = 1;
 		
 		while(mCursorSubMenus.moveToNext())
@@ -87,6 +88,7 @@ public class SubMenuSettings extends ListActivity {
 		}
 		
 		refreshCursor();
+		refreshMenuList(mDatabase);
 		
     	return super.onContextItemSelected(item);
     }
@@ -148,7 +150,7 @@ public class SubMenuSettings extends ListActivity {
 		try {
 			if(mCursor != null)
 				mCursor.close();
-			mCursor = mDatabase.query(false, "submenus_entries", new String[] { "_id", "name", "intent", "submenu" }, null, null, null, null, null, null);
+			mCursor = mDatabase.query(false, "submenus_entries", new String[] { "_id", "name", "intent", "submenu" }, null, null, null, null, "name", null);
 			mAdapter = new ApplicationsAdapter(this, mCursor);
 			setListAdapter(mAdapter);
 		} catch(SQLiteException e) {
@@ -178,13 +180,17 @@ public class SubMenuSettings extends ListActivity {
         mDatabase = hlp.getWritableDatabase();
 
     	Log.d("SubMenuSettings", "Loaded db "+mDatabase.getPath());
+    	
+    	dlg = ProgressDialog.show(this, "Please wait...", "Loading applications...");
 
 		InsertAllApps();
 
         refreshCursor();
         
-        mCursorSubMenus = mDatabase.query(false, "submenus", new String[] { "_id", "name" }, null, null, null, null, null, null);
+        refreshMenuList(mDatabase);
         
+        dlg.cancel();
+
         Log.d("SubMenuSettings", "Count: "+mCursorSubMenus.getCount());
         
         mListView.setOnCreateContextMenuListener(
@@ -213,6 +219,14 @@ public class SubMenuSettings extends ListActivity {
 		
 		mCursorSubMenus.close();
 		mDatabase.close();
+	}
+	
+	public static void refreshMenuList(SQLiteDatabase db)
+	{
+		if(mCursorSubMenus != null)
+			mCursorSubMenus.close();
+		if(db != null)
+			mCursorSubMenus = db.query(false, "submenus", new String[] { "_id", "name" }, null, null, null, null, null, null);
 	}
 		
 	void MoveApplication(int ApplicationId, String menu, String name, String intent, boolean insert)
