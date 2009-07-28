@@ -96,7 +96,6 @@ public class Workspace extends ViewGroup implements DropTarget, DragSource, Drag
     private boolean mLocked;
 
     private int mTouchSlop;
-    private int mMaximumVelocity;
 
     final Rect mDrawerBounds = new Rect();
     final Rect mClipBounds = new Rect();
@@ -148,9 +147,7 @@ public class Workspace extends ViewGroup implements DropTarget, DragSource, Drag
         mPaint = new Paint();
         mPaint.setDither(false);
 
-        final ViewConfiguration configuration = ViewConfiguration.get(getContext());
-        mTouchSlop = configuration.getScaledTouchSlop();
-        mMaximumVelocity = configuration.getScaledMaximumFlingVelocity();
+        mTouchSlop = ViewConfiguration.get(getContext()).getScaledTouchSlop();
     }
 
     /**
@@ -805,7 +802,7 @@ public class Workspace extends ViewGroup implements DropTarget, DragSource, Drag
         case MotionEvent.ACTION_UP:
             if (mTouchState == TOUCH_STATE_SCROLLING) {
                 final VelocityTracker velocityTracker = mVelocityTracker;
-                velocityTracker.computeCurrentVelocity(1000, mMaximumVelocity);
+                velocityTracker.computeCurrentVelocity(1000);
                 int velocityX = (int) velocityTracker.getXVelocity();
 
                 if (velocityX > SNAP_VELOCITY && mCurrentScreen > 0) {
