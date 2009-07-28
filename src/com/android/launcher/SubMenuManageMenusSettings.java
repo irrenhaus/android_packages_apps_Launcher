@@ -24,6 +24,8 @@ import android.widget.AdapterView;
 import android.widget.CursorAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
 
 import com.android.launcher.SubMenuSettings.SubMenuDBHelper;
@@ -62,7 +64,16 @@ public class SubMenuManageMenusSettings extends ListActivity {
 		if(resultCode != 0 || data == null)
 			return;
 		
-		AddMenu(data.getStringExtra("com.android.launcher.AddSubMenu"));
+		if(data.getStringExtra("com.android.launcher.AddSubMenu") != null)
+		{
+			AddMenu(data.getStringExtra("com.android.launcher.AddSubMenu"));
+		}
+		else if(data.getStringExtra("com.android.launcher.RenameSubMenuOrig") != null &&
+				data.getStringExtra("com.android.launcher.RenameSubMenuNew") != null)
+		{
+			RenameMenu(data.getStringExtra("com.android.launcher.RenameSubMenuOrig"), data.getStringExtra("com.android.launcher.RenameSubMenuNew"));
+		}
+		
 		refreshCursor();
 		SubMenuSettings.refreshMenuList(mDatabase);
 	}
@@ -75,11 +86,21 @@ public class SubMenuManageMenusSettings extends ListActivity {
 		mDatabase.insert("submenus", null, values);
 		
 		refreshCursor();
+	}
+	
+	void RenameMenu(String which, String title)
+	{
+		ContentValues content_values = new ContentValues();
+		content_values.put("submenu", title);
 		
-        final LauncherModel model = Launcher.getModel();
-
-        model.dropApplications();
-        model.loadApplications(false, SubMenuSettings.activeLauncher, false);
+		ContentValues menu_values = new ContentValues();
+		menu_values.put("name", title);
+		
+		mDatabase.update("submenus_entries", content_values, "submenu = '"+which+"'", null);
+		
+		mDatabase.update("submenus", menu_values, "name = '"+which+"'", null);
+		
+		refreshCursor();
 	}
 	
 	void DeleteMenu(String title)
@@ -91,11 +112,6 @@ public class SubMenuManageMenusSettings extends ListActivity {
 		mDatabase.delete("submenus", "name = '"+title+"'", null);
 		
 		refreshCursor();
-		
-        final LauncherModel model = Launcher.getModel();
-
-        model.dropApplications();
-        model.loadApplications(false, SubMenuSettings.activeLauncher, false);
 	}
 	
 	private void refreshCursor() {
@@ -135,10 +151,22 @@ public class SubMenuManageMenusSettings extends ListActivity {
 
         refreshCursor();
         
+        mListView.setOnItemClickListener(new OnItemClickListener() {
+			public void onItemClick(AdapterView<?> parent, View view,
+					int position, long id) {
+				mCursor.moveToPosition(position);
+				final String name = mCursor.getString(1);
+				
+				Intent intent = new Intent(SubMenuManageMenusSettings.this, SubMenuRenameMenu.class);
+				intent.putExtra("com.android.launcher.MenuName", name);
+				
+				SubMenuManageMenusSettings.this.startActivityForResult(intent, 0);
+			}
+        });
+        
         mListView.setOnItemLongClickListener(new OnItemLongClickListener() {
 			public boolean onItemLongClick(AdapterView<?> parent, View view,
 					int position, long id) {
-				
 				mCursor.moveToPosition(position);
 				final String name = mCursor.getString(1);
 						
@@ -160,7 +188,6 @@ public class SubMenuManageMenusSettings extends ListActivity {
 				AlertDialog alert = builder.create();
 				
 				alert.show();
-				
 				return false;
 			}
         });

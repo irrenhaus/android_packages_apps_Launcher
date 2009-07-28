@@ -576,8 +576,8 @@ public class LauncherModel {
                 		Log.d("SubMenu", "Adding..."+info.title);
 	                	if (action.add(info) && !mStopped) {
 	                		Log.d("SubMenu", "Added! "+info.title);
-	                        launcher.runOnUiThread(action);
-	                        action = new ChangeNotifier(applicationList, false);
+	                        //launcher.runOnUiThread(action);
+	                        //action = new ChangeNotifier(applicationList, false);
 	                    }
 	                }
 	                
@@ -621,8 +621,8 @@ public class LauncherModel {
                         }
                     	
                     	if ((subMenu == null || subMenu.equals("MainMenu")) && action.add(application) && !mStopped) {
-                            launcher.runOnUiThread(action);
-                            action = new ChangeNotifier(applicationList, false);
+                            //launcher.runOnUiThread(action);
+                            //action = new ChangeNotifier(applicationList, false);
                         }
                     }
 
@@ -633,6 +633,15 @@ public class LauncherModel {
                 
                 mDatabase.close();
                 msmDatabase.close();
+                
+                launcher.runOnUiThread(new Runnable() {
+					public void run() {
+						final LauncherModel model = Launcher.getModel();
+
+		                model.dropApplications();
+					}
+                });
+                
                 launcher.runOnUiThread(action);
             }
 

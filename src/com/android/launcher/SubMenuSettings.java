@@ -24,6 +24,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.View.OnCreateContextMenuListener;
+import android.view.ViewGroup.OnHierarchyChangeListener;
 import android.widget.CursorAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -79,7 +80,12 @@ public class SubMenuSettings extends ListActivity {
 		
 		while(mCursorSubMenus.moveToNext())
 		{
-			if(item.getItemId() == mnuMoveItem+i)
+			if(item.getItemId() == mnuMoveItem)
+			{
+				MoveApplication(ApplicationId, "MainMenu", name, null, false);
+				break;
+			}
+			else if(item.getItemId() == mnuMoveItem+i)
 			{
 				MoveApplication(ApplicationId, mCursorSubMenus.getString(mCursorSubMenus.getColumnIndex("name")), name, null, false);
 				break;
@@ -143,13 +149,31 @@ public class SubMenuSettings extends ListActivity {
 		}
 	}
 
+	private int mScrollX;
+	private int mScrollY;
+	
 	private void refreshCursor() {
+		mScrollX = 0;
+		mScrollY = 0;
+		
 		try {
 			if(mCursor != null)
 				mCursor.close();
-			mCursor = mDatabase.query(false, "submenus_entries", new String[] { "_id", "name", "intent", "submenu" }, null, null, null, null, "name", null);
+			mCursor = mDatabase.query(false, "submenus_entries", new String[] { "_id", "name", "intent", "submenu" }, null, null, null, null, "Upper(name)", null);
 			mAdapter = new ApplicationsAdapter(this, mCursor);
+
+			mScrollX = getListView().getScrollX();
+			mScrollY = getListView().getScrollY();
 			setListAdapter(mAdapter);
+			
+			getListView().setOnHierarchyChangeListener(new OnHierarchyChangeListener() {
+				public void onChildViewAdded(View parent, View child) {
+					getListView().scrollTo(mScrollX, mScrollY);
+				}
+				
+				public void onChildViewRemoved(View parent, View child) {
+				}
+			});
 		} catch(SQLiteException e) {
 			Log.d("SubMenuSettings", "Error: "+e.getMessage());
 			
@@ -220,12 +244,22 @@ public class SubMenuSettings extends ListActivity {
 		mDatabase.close();
 	}
 	
+	@Override
+	public void onStop()
+	{
+		super.onStop();
+		
+        final LauncherModel model = Launcher.getModel();
+
+        model.loadApplications(false, activeLauncher, false);
+	}
+	
 	public static void refreshMenuList(SQLiteDatabase db)
 	{
 		if(mCursorSubMenus != null)
 			mCursorSubMenus.close();
 		if(db != null)
-			mCursorSubMenus = db.query(false, "submenus", new String[] { "_id", "name" }, null, null, null, null, null, null);
+			mCursorSubMenus = db.query(false, "submenus", new String[] { "_id", "name" }, null, null, null, null, "Upper(name)", null);
 	}
 		
 	void MoveApplication(int ApplicationId, String menu, String name, String intent, boolean insert)
@@ -268,11 +302,6 @@ public class SubMenuSettings extends ListActivity {
 				Log.d("MoveApplication", "Submenu of app "+name+" updated");
 			
 			refreshCursor();
-			
-	        final LauncherModel model = Launcher.getModel();
-	
-	        model.dropApplications();
-	        model.loadApplications(false, activeLauncher, false);
 		}catch(SQLiteException e) {
 			Log.d("SubMenuSettings", "Error: "+e.getMessage());
 		}
@@ -287,11 +316,6 @@ public class SubMenuSettings extends ListActivity {
 		mDatabase.insert("submenus", null, values);
 		
 		refreshCursor();
-		
-        final LauncherModel model = Launcher.getModel();
-
-        model.dropApplications();
-        model.loadApplications(false, activeLauncher, false);
 	}
 	
 	void InsertAllApps()
