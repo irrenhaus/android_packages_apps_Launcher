@@ -101,6 +101,7 @@ public class ExtendedDrawerSettings extends ListActivity {
 		mCursor = mDatabase.query(false, "extendeddrawer_hidden", new String[] { "_id", "name" }, null, null, null, null, null, null);
 		mAdapter = new ApplicationsAdapter(this, mCursor);
 		setListAdapter(mAdapter);
+		
 	}
 
 	@Override
