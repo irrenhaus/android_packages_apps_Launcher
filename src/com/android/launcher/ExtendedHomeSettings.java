@@ -1,6 +1,7 @@
 package com.android.launcher;
 
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.content.Context;
 import android.os.Bundle;
 import android.widget.CheckBox;
@@ -11,6 +12,16 @@ import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 
 public class ExtendedHomeSettings extends Activity {
+
+	@Override
+	protected void onPause() {
+
+		ActivityManager am = (ActivityManager)getSystemService(
+                Context.ACTIVITY_SERVICE);
+        am.restartPackage("com.android.launcher");
+		
+		super.onPause();
+	}
 
 	public static String TAG = "Launcher - Extended";
 	Context context;

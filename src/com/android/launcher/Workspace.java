@@ -113,7 +113,7 @@ public class Workspace extends ViewGroup implements DropTarget, DragSource, Drag
     int mDrawerContentHeight;
     int mDrawerContentWidth;
     
-    int mHomeScreens = 3;
+    int mHomeScreens = 0;
     int mHomeScreensLoaded = 0;
 
     /**
@@ -124,6 +124,7 @@ public class Workspace extends ViewGroup implements DropTarget, DragSource, Drag
      */
     public Workspace(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
+
     }
 
     /**
@@ -141,6 +142,9 @@ public class Workspace extends ViewGroup implements DropTarget, DragSource, Drag
         /* Rogro82@xda Extended : Load the default and number of homescreens from the settings database */
         mDefaultScreen = com.android.launcher.extended.data.ExtendedSettings.Home_DefaultScreen(context);
         mHomeScreens = com.android.launcher.extended.data.ExtendedSettings.Home_HomeScreens(context.getApplicationContext());
+
+        Launcher.DEFAULT_SCREN = mDefaultScreen;
+        Launcher.SCREEN_COUNT = mHomeScreens;
 
         a.recycle();
 
