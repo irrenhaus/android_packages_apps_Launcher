@@ -94,6 +94,8 @@
     android:theme="@android:style/Theme.Dialog"/>
 	    <activity android:name="SubMenuAddMenu" android:label="Add Menu" 
     android:theme="@android:style/Theme.Dialog"/>
+	    <activity android:name="SubMenuRenameMenu" android:label="Rename Menu" 
+    android:theme="@android:style/Theme.Dialog"/>
 
         <activity
             android:name="WallpaperChooser"
