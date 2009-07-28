@@ -52,7 +52,7 @@ public class SubMenuAdapter extends ArrayAdapter<ApplicationInfo> {
 		SubMenuDBHelper hlp = new SubMenuDBHelper(context);
 		SQLiteDatabase db = hlp.getReadableDatabase();
 		
-		Cursor data = db.query("submenus_entries", new String[] {"_id", "name", "intent", "submenu"}, "submenu = '"+title+"'", null, null, null, null);
+		Cursor data = db.query("submenus_entries", new String[] {"_id", "name", "intent", "submenu"}, "submenu = '"+title+"'", null, null, "name", null);
 		
 		final Intent mainIntent = new Intent(Intent.ACTION_MAIN, null);
         mainIntent.addCategory(Intent.CATEGORY_LAUNCHER);
