@@ -23,7 +23,7 @@ public class SubMenu extends Activity implements OnItemClickListener{
 
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         
-        context = this.getApplicationContext();
+        context = this;
         
         setContentView(R.layout.submenu);
         
