@@ -55,7 +55,7 @@ public class SubMenu extends Activity implements OnItemClickListener{
 	public void onItemClick(AdapterView<?> parent, View view, int position,
 			long id) {
 		this.startActivity(adapter.getItem(position).intent);
-		if(com.android.launcher.extended.data.ExtendedSettings.Home_CloseFolders(parent.getContext().getApplicationContext()))
+		if(com.android.launcher.extended.data.ExtendedSettings.Home_CloseFolders(parent.getContext()))
         {
             // Close the folder when an app is started
             this.finish();

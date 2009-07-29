@@ -256,7 +256,7 @@ public final class Launcher extends Activity implements View.OnClickListener, On
         SubMenuSettings.activeLauncher = this;
 
         /* Rogro82@xda Extended : check and possibly disable auto-rotate */
-        if(com.android.launcher.extended.data.ExtendedSettings.Sensor_Enabled(this.getApplicationContext())==0) {
+        if(com.android.launcher.extended.data.ExtendedSettings.Sensor_Enabled(this)==0) {
             this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);
         }
 

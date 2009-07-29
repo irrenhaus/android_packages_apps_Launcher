@@ -533,7 +533,7 @@ public class LauncherModel {
                 ChangeNotifier appAction = new ChangeNotifier(applicationList, false);
                 final HashMap<ComponentName, ApplicationInfo> appInfoCache = mAppInfoCache;
                 
-                Context context = launcher.getApplicationContext();
+                Context context = launcher;
                 
                 ExtendedDrawerDBHelper hlp = new ExtendedDrawerDBHelper(context); 
                 mDatabase = hlp.getWritableDatabase();
