@@ -82,12 +82,12 @@ public class SubMenuSettings extends ListActivity {
 		{
 			if(item.getItemId() == mnuMoveItem)
 			{
-				MoveApplication(ApplicationId, "MainMenu", name, null, false);
+				MoveApplication("MainMenu", name, null, false);
 				break;
 			}
 			else if(item.getItemId() == mnuMoveItem+i)
 			{
-				MoveApplication(ApplicationId, mCursorSubMenus.getString(mCursorSubMenus.getColumnIndex("name")), name, null, false);
+				MoveApplication(mCursorSubMenus.getString(mCursorSubMenus.getColumnIndex("name")), name, null, false);
 				break;
 			}
 			i++;
@@ -97,8 +97,12 @@ public class SubMenuSettings extends ListActivity {
     }
 	
 	protected static class SubMenuDBHelper extends SQLiteOpenHelper {
+		private Context context;
+		
 		public SubMenuDBHelper(Context context) {
-			super(context, "submenu.sqlite", null, 1);
+			super(context, "submenu.sqlite", null, 2);
+			
+			this.context = context;
 			
 			Log.d("SubMenuDBHelper", "Created");
 		}
@@ -117,6 +121,66 @@ public class SubMenuSettings extends ListActivity {
 
 		@Override
 		public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+			Cursor data = db.query("submenus_entries", new String[] {"_id", "name", "intent", "submenu"}, null, null, "Upper(name)", null, null);
+			
+			final Intent mainIntent = new Intent(Intent.ACTION_MAIN, null);
+	        mainIntent.addCategory(Intent.CATEGORY_LAUNCHER);
+			PackageManager manager = context.getPackageManager();
+	        final List<ResolveInfo> apps = manager.queryIntentActivities(mainIntent, 0);
+			
+	        Log.d("SubMenuSettings", "Upgrading db to version 2...");
+	        
+			while(data.moveToNext())
+			{
+		        for(int i = 0; i < apps.size(); i++)
+		        {
+		        	ResolveInfo info = apps.get(i);
+		        	
+		        	String apptitle = info.loadLabel(manager).toString();
+		        	if (apptitle == null) {
+		                apptitle = info.activityInfo.name;
+		            }
+		        	
+		        	if(!apptitle.equals(data.getString(data.getColumnIndex("name"))))
+		        		continue;
+		        	
+		        	ComponentName componentName = new ComponentName(
+		                    info.activityInfo.applicationInfo.packageName,
+		                    info.activityInfo.name);
+		        	
+		        	ApplicationInfo application = new ApplicationInfo();
+		            application.container = ItemInfo.NO_ID;
+
+		            updateApplicationInfoTitleAndIcon(manager, info, application, context);
+
+		            application.setActivity(componentName,
+		                    Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+		        	
+		            if(application.title.equals(data.getString(data.getColumnIndex("name"))))
+		            {
+		            	int submenu = data.getColumnIndex("submenu");
+		            	int name = data.getColumnIndex("name");
+		            	
+		            	ContentValues values = new ContentValues();
+		    			values.put("name", data.getString(name));
+		    			values.put("intent", application.intent.toURI());
+		    			values.put("submenu", data.getString(submenu));
+		    			
+		    			if(db.update("submenus_entries", values, "name = '"+data.getString(name)+"'", null) <= 0)
+		    			{
+		    				Log.d("MoveApplication", "update <= 0");
+		    			}
+		    			else
+		    				Log.d("MoveApplication", "App "+data.getString(name)+" updated");
+		            	
+		            	break;
+		            }
+		        }
+			}
+			
+			Log.d("SubMenuSettings", "Upgrading successfull");
+			
+			data.close();
 		}
 		
 		@Override
@@ -201,16 +265,12 @@ public class SubMenuSettings extends ListActivity {
         mDatabase = hlp.getWritableDatabase();
 
     	Log.d("SubMenuSettings", "Loaded db "+mDatabase.getPath());
-    	
-    	dlg = ProgressDialog.show(this, "Please wait...", "Loading applications...");
 
 		InsertAllApps();
 
         refreshCursor();
         
         refreshMenuList(mDatabase);
-        
-        dlg.cancel();
 
         Log.d("SubMenuSettings", "Count: "+mCursorSubMenus.getCount());
         
@@ -262,21 +322,16 @@ public class SubMenuSettings extends ListActivity {
 			mCursorSubMenus = db.query(false, "submenus", new String[] { "_id", "name" }, null, null, null, null, "Upper(name)", null);
 	}
 		
-	void MoveApplication(int ApplicationId, String menu, String name, String intent, boolean insert)
+	void MoveApplication(String menu, String name, String intent, boolean insert)
 	{
 		if(insert)
 		{
-			Cursor tmp = mDatabase.query(false, "submenus_entries", new String[] { "_id", "name", "intent" }, null, null, null, null, null, null);
+			Cursor tmp = mDatabase.query(false, "submenus_entries", new String[] { "_id", "name", "intent" }, "intent = '"+intent+"'", null, null, null, null, null);
 	        
 			while(tmp.moveToNext())
 			{
-				String n = tmp.getString(1);
-				String i = tmp.getString(2);
-				if((n != null && n.equals(name)) || (i != null && i.equals(intent)))
-				{
-					tmp.close();
-					return;
-				}
+				tmp.close();
+				return;
 			}
 			
 			tmp.close();
@@ -341,7 +396,7 @@ public class SubMenuSettings extends ListActivity {
             application.setActivity(componentName,
                     Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
             
-        	MoveApplication(i, "MainMenu", application.title.toString(), application.intent.toString(), true);
+        	MoveApplication("MainMenu", application.title.toString(), application.intent.toURI(), true);
         }
 	}
 	

@@ -1,5 +1,6 @@
 package com.android.launcher;
 
+import java.net.URISyntaxException;
 import java.util.List;
 
 import android.content.ComponentName;
@@ -9,6 +10,7 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -47,7 +49,7 @@ public class SubMenuAdapter extends ArrayAdapter<ApplicationInfo> {
         return convertView;
     }
 	
-	public void generateAppsList(String title)
+    /*public void generateAppsList(String title)
 	{
 		SubMenuDBHelper hlp = new SubMenuDBHelper(context);
 		SQLiteDatabase db = hlp.getReadableDatabase();
@@ -91,6 +93,58 @@ public class SubMenuAdapter extends ArrayAdapter<ApplicationInfo> {
 	            	break;
 	            }
 	        }
+		}
+		
+		data.close();
+		db.close();
+	}*/
+    
+    public void generateAppsList(String title)
+	{
+		SubMenuDBHelper hlp = new SubMenuDBHelper(context);
+		SQLiteDatabase db = hlp.getReadableDatabase();
+		
+		Cursor data = db.query("submenus_entries", new String[] {"_id", "name", "intent", "submenu"}, "submenu = '"+title+"'", null, "Upper(name)", null, null);
+		
+		while(data.moveToNext())
+		{
+			Intent intent;
+			try {
+				intent = Intent.getIntent(data.getString(2));
+			} catch (URISyntaxException e) {
+				Log.d("SubMenuAdapter", "Could not get intent from uri!");
+				continue;
+			}
+			
+			PackageManager manager = context.getPackageManager();
+	        final List<ResolveInfo> apps = manager.queryIntentActivities(intent, 0);
+			
+	        if(apps.size() <= 0)
+	        	continue;
+	        
+	        ResolveInfo info = apps.get(0);
+	        	
+	        	String apptitle = info.loadLabel(manager).toString();
+	        	if (apptitle == null) {
+	                apptitle = info.activityInfo.name;
+	            }
+	        	
+	        	if(!apptitle.equals(data.getString(data.getColumnIndex("name"))))
+	        		continue;
+	        	
+	        	ComponentName componentName = new ComponentName(
+	                    info.activityInfo.applicationInfo.packageName,
+	                    info.activityInfo.name);
+	        	
+	        	ApplicationInfo application = new ApplicationInfo();
+	            application.container = ItemInfo.NO_ID;
+
+	            updateApplicationInfoTitleAndIcon(manager, info, application, context);
+
+	            application.setActivity(componentName,
+	                    Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+	        	
+	            this.add(application);
 		}
 		
 		data.close();
