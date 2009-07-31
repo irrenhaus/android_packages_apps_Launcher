@@ -324,6 +324,24 @@ public class SubMenuSettings extends ListActivity {
 		
 	void MoveApplication(String menu, String name, String intent, boolean insert)
 	{
+		Cursor fix = mDatabase.query(false, "submenus_entries", new String[] { "_id", "name", "intent", "submenu" }, "name = '"+name+"'", null, null, null, null, null);
+			
+		try
+		{
+			fix.moveToFirst();
+			int field = fix.getColumnIndex("intent");
+			if(fix.getString(field) == null || fix.getString(field).equals("null") || fix.getString(field).equals(""))
+			{
+				menu = fix.getString(3);
+				insert = false;
+			}
+		} catch (Exception e)
+		{
+			Log.d("SubMenuSettings", "Error at "+name);
+		}
+		
+		fix.close();
+		
 		if(insert)
 		{
 			Cursor tmp = mDatabase.query(false, "submenus_entries", new String[] { "_id", "name", "intent" }, "intent = '"+intent+"'", null, null, null, null, null);
@@ -341,9 +359,13 @@ public class SubMenuSettings extends ListActivity {
 		
 		try {
 			ContentValues values = new ContentValues();
-			values.put("name", name);
-			values.put("intent", intent);
-			values.put("submenu", menu);
+			
+			if(name != null)
+				values.put("name", name);
+			if(intent != null)
+				values.put("intent", intent);
+			if(menu != null)
+				values.put("submenu", menu);
 			
 			if(insert)
 			{
