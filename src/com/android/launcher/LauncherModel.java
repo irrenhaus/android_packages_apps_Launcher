@@ -600,7 +600,7 @@ public class LauncherModel {
                     //irrenhaus@xda: check if it should be in the main menu
                     Cursor sub = null;
                     try {
-                    sub = msmDatabase.query(false, "submenus_entries", new String[] { "_id", "name", "intent", "submenu" }, null, null, null, null, null, null);
+                    sub = msmDatabase.query(false, "submenus_entries", new String[] { "_id", "name", "intent", "submenu" }, "intent='" + application.intent.toURI() + "'", null, null, null, null, null);
                     } catch(SQLiteException e) {
                     	Log.d("SubMenu", e.getMessage());
                     }
@@ -616,8 +616,6 @@ public class LauncherModel {
                     			String n = sub.getString(1);
                     			String s = sub.getString(3);
                     			
-                    			if((n != null && n.equals(application.title)) ||
-                    			   (s != null && s.equals(application.intent.toString())))
                     			subMenu = sub.getString(sub.getColumnIndex("submenu"));
                     		}
                         }
