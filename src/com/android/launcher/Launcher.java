@@ -782,7 +782,7 @@ public final class Launcher extends Activity implements View.OnClickListener, On
             super.onSaveInstanceState(outState);
         }
 
-        if (mDrawer.isOpened()) {
+        if (mDrawer.isOpened() && getChangingConfigurations() != 0) {
             outState.putBoolean(RUNTIME_STATE_ALL_APPS_FOLDER, true);
         }        
 
