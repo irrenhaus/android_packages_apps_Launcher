@@ -74,6 +74,7 @@ public class SubMenuSettings extends ListActivity {
 		mCursor.moveToPosition(itemId);
 		int ApplicationId = mCursor.getInt(0);
 		String name = mCursor.getString(mCursor.getColumnIndex("name"));
+		String intent = mCursor.getString(mCursor.getColumnIndex("intent"));
 		
 		refreshMenuList(mDatabase);
 		
@@ -83,13 +84,12 @@ public class SubMenuSettings extends ListActivity {
 		{
 			if(item.getItemId() == mnuMoveItem)
 			{
-				MoveApplication("MainMenu", name, null, false);
-				
+				MoveApplication("MainMenu", name, intent, false);
 				break;
 			}
 			else if(item.getItemId() == mnuMoveItem+i)
 			{
-				MoveApplication(mCursorSubMenus.getString(mCursorSubMenus.getColumnIndex("name")), name, null, false);
+				MoveApplication(mCursorSubMenus.getString(mCursorSubMenus.getColumnIndex("name")), name, intent, false);
 				break;
 			}
 			i++;
@@ -461,12 +461,27 @@ public class SubMenuSettings extends ListActivity {
 			{
 				mDatabase.insert("submenus_entries", null, values);
 			}
-			else if(mDatabase.update("submenus_entries", values, "name = '"+name+"'", null) <= 0)
-			{
-				Log.d("MoveApplication", "update <= 0");
-			}
 			else
-				Log.d("MoveApplication", "Submenu of app "+name+" updated");
+			{
+				if(intent != null)
+				{
+					if(mDatabase.update("submenus_entries", values, "intent = '"+intent+"' AND name = '"+name+"'", null) <= 0)
+					{
+						Log.d("MoveApplication", "update <= 0");
+					}
+					else
+						Log.d("MoveApplication", "Submenu of app "+name+" updated");
+				}
+				else if(name != null)
+				{
+					if(mDatabase.update("submenus_entries", values, "name = '"+name+"'", null) <= 0)
+					{
+						Log.d("MoveApplication", "update <= 0");
+					}
+					else
+						Log.d("MoveApplication", "Submenu of app "+name+" updated");
+				}
+			}
 			
 			refreshCursor();
 		}catch(SQLiteException e) {
