@@ -95,7 +95,11 @@ public class AllAppsGridView extends GridView implements AdapterView.OnItemClick
 
     public void onItemClick(AdapterView parent, View v, int position, long id) {
         ApplicationInfo app = (ApplicationInfo) parent.getItemAtPosition(position);
-        mLauncher.startActivitySafely(app.intent);
+        
+        if(app.isSubMenu)
+        	Launcher.getModel().openSubMenu(app.title.toString());
+        else
+        	mLauncher.startActivitySafely(app.intent);
     }
 
     public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {

@@ -144,7 +144,7 @@ public class SubMenuManageMenusSettings extends ListActivity {
         mListView = (ListView) findViewById(android.R.id.list);
         mInflater = getLayoutInflater();
         
-        SubMenuDBHelper hlp = new SubMenuDBHelper(this); 
+        SubMenuDBHelper hlp = new SubMenuDBHelper(this, false); 
         mDatabase = hlp.getWritableDatabase();
 
     	Log.d("SubMenuManageSettings", "Loaded db "+mDatabase.getPath());

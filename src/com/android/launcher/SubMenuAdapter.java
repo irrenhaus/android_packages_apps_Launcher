@@ -48,75 +48,30 @@ public class SubMenuAdapter extends ArrayAdapter<ApplicationInfo> {
 
         return convertView;
     }
-	
-    /*public void generateAppsList(String title)
-	{
-		SubMenuDBHelper hlp = new SubMenuDBHelper(context);
-		SQLiteDatabase db = hlp.getReadableDatabase();
-		
-		Cursor data = db.query("submenus_entries", new String[] {"_id", "name", "intent", "submenu"}, "submenu = '"+title+"'", null, "Upper(name)", null, null);
-		
-		final Intent mainIntent = new Intent(Intent.ACTION_MAIN, null);
-        mainIntent.addCategory(Intent.CATEGORY_LAUNCHER);
-		PackageManager manager = context.getPackageManager();
-        final List<ResolveInfo> apps = manager.queryIntentActivities(mainIntent, 0);
-		
-		while(data.moveToNext())
-		{
-	        for(int i = 0; i < apps.size(); i++)
-	        {
-	        	ResolveInfo info = apps.get(i);
-	        	
-	        	String apptitle = info.loadLabel(manager).toString();
-	        	if (apptitle == null) {
-	                apptitle = info.activityInfo.name;
-	            }
-	        	
-	        	if(!apptitle.equals(data.getString(data.getColumnIndex("name"))))
-	        		continue;
-	        	
-	        	ComponentName componentName = new ComponentName(
-	                    info.activityInfo.applicationInfo.packageName,
-	                    info.activityInfo.name);
-	        	
-	        	ApplicationInfo application = new ApplicationInfo();
-	            application.container = ItemInfo.NO_ID;
-
-	            updateApplicationInfoTitleAndIcon(manager, info, application, context);
-
-	            application.setActivity(componentName,
-	                    Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
-	        	
-	            if(application.title.equals(data.getString(data.getColumnIndex("name"))))
-	            {
-	            	this.add(application);
-	            	break;
-	            }
-	        }
-		}
-		
-		data.close();
-		db.close();
-	}*/
     
     public void generateAppsList(String title)
 	{
-		SubMenuDBHelper hlp = new SubMenuDBHelper(context);
+		SubMenuDBHelper hlp = new SubMenuDBHelper(context, false);
 		SQLiteDatabase db = hlp.getReadableDatabase();
 		
 		Cursor data = db.query("submenus_entries", new String[] {"_id", "name", "intent", "submenu"}, "submenu = '"+title+"'", null, "Upper(name)", null, null);
+
+		PackageManager manager = context.getPackageManager();
 		
 		while(data.moveToNext())
 		{
 			Intent intent;
 			try {
 				intent = Intent.getIntent(data.getString(2));
+				if(intent.resolveActivity(manager) == null)
+				{
+					continue;
+				}
 			} catch (URISyntaxException e) {
 				Log.d("SubMenuAdapter", "Could not get intent from uri!");
 				continue;
 			}
 			
-			PackageManager manager = context.getPackageManager();
 	        final List<ResolveInfo> apps = manager.queryIntentActivities(intent, 0);
 			
 	        if(apps.size() <= 0)

@@ -1,5 +1,6 @@
 package com.android.launcher;
 
+import java.net.URISyntaxException;
 import java.util.List;
 
 import android.app.ListActivity;
@@ -42,7 +43,7 @@ public class SubMenuSettings extends ListActivity {
 
 	public static final int mnuMoveItem = Menu.FIRST + 1;
 	
-	private ProgressDialog dlg;
+	private static ProgressDialog dlg;
 		
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu)
@@ -83,6 +84,7 @@ public class SubMenuSettings extends ListActivity {
 			if(item.getItemId() == mnuMoveItem)
 			{
 				MoveApplication("MainMenu", name, null, false);
+				
 				break;
 			}
 			else if(item.getItemId() == mnuMoveItem+i)
@@ -99,10 +101,70 @@ public class SubMenuSettings extends ListActivity {
 	protected static class SubMenuDBHelper extends SQLiteOpenHelper {
 		private Context context;
 		
-		public SubMenuDBHelper(Context context) {
+		public SubMenuDBHelper(Context context, boolean check) {
 			super(context, "submenu.sqlite", null, 2);
 			
 			this.context = context;
+			
+	        if(check)
+	        {
+				SQLiteDatabase db = this.getWritableDatabase();
+				
+				Cursor data = db.query("submenus_entries", new String[] {"_id", "name", "intent", "submenu"}, null, null, "Upper(name)", null, null);
+				
+				final Intent mainIntent = new Intent(Intent.ACTION_MAIN, null);
+		        mainIntent.addCategory(Intent.CATEGORY_LAUNCHER);
+				PackageManager manager = context.getPackageManager();
+		        final List<ResolveInfo> apps = manager.queryIntentActivities(mainIntent, 0);
+			
+		        Log.d("SubMenuSettings", "Checking db...");
+		        
+				while(data.moveToNext())
+				{
+					boolean isInstalled = false;
+					
+			        for(int i = 0; i < apps.size(); i++)
+			        {
+			        	ResolveInfo info = apps.get(i);
+			        	
+			        	String apptitle = info.loadLabel(manager).toString();
+			        	if (apptitle == null) {
+			                apptitle = info.activityInfo.name;
+			            }
+			        	
+			        	if(!apptitle.equals(data.getString(data.getColumnIndex("name"))))
+			        		continue;
+			        	
+			        	ComponentName componentName = new ComponentName(
+			                    info.activityInfo.applicationInfo.packageName,
+			                    info.activityInfo.name);
+			        	
+			        	ApplicationInfo application = new ApplicationInfo();
+			            application.container = ItemInfo.NO_ID;
+	
+			            updateApplicationInfoTitleAndIcon(manager, info, application, context);
+	
+			            application.setActivity(componentName,
+			                    Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+			        	
+			            if(application.title.equals(data.getString(data.getColumnIndex("name"))))
+			            {
+			            	isInstalled = true;
+			            	
+			            	break;
+			            }
+			        }
+			        
+			        if(!isInstalled)
+			        {
+			        	db.delete("submenus_entries", "intent='"+data.getString(data.getColumnIndex("intent"))+"'", null);
+			        }
+				}
+				
+				Log.d("SubMenuSettings", "DB check successfull");
+				
+				data.close();
+	        }
 			
 			Log.d("SubMenuDBHelper", "Created");
 		}
@@ -199,10 +261,36 @@ public class SubMenuSettings extends ListActivity {
 		public void bindView(View view, Context context, Cursor cursor) {
 
 			TextView ApplicationNameText = (TextView) view.findViewById(R.id.txtTitle);
-			String applicationName = cursor.getString(1)+": "+cursor.getString(3);
+			String applicationName = cursor.getString(1)+"\n"+cursor.getString(3);
 
+			PackageManager manager = SubMenuSettings.this.getPackageManager();
+	        List<ResolveInfo> apps = null;
+			try {
+				apps = manager.queryIntentActivities(Intent.getIntent(cursor.getString(cursor.getColumnIndex("intent"))), 0);
+			} catch (URISyntaxException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+        	ApplicationInfo application = new ApplicationInfo();
+        	
+	        for(int i = 0; i < apps.size(); i++)
+	        {
+	        	ResolveInfo info = apps.get(i);
+	        	
+	        	ComponentName componentName = new ComponentName(
+	                    info.activityInfo.applicationInfo.packageName,
+	                    info.activityInfo.name);
+	        	
+	        	application = new ApplicationInfo();
+	            application.container = ItemInfo.NO_ID;
+
+	            SubMenuSettings.updateApplicationInfoTitleAndIcon(manager, info, application, SubMenuSettings.this);
+	        }
+			
 			ApplicationNameText.setText(applicationName);
-
+			ApplicationNameText.setCompoundDrawablesWithIntrinsicBounds(application.icon, null, null, null);
+			ApplicationNameText.setTextSize(14);
 		}
 
 		@Override
@@ -217,38 +305,29 @@ public class SubMenuSettings extends ListActivity {
 	private int mScrollY;
 	
 	private void refreshCursor() {
+		dlg.setTitle("Refreshing database cursor...");
+		dlg.setMessage("Please wait...");
+		
 		mScrollX = 0;
 		mScrollY = 0;
 		
 		try {
 			if(mCursor != null)
 				mCursor.close();
-			mCursor = mDatabase.query(false, "submenus_entries", new String[] { "_id", "name", "intent", "submenu" }, null, null, null, null, "Upper(name)", null);
-			mAdapter = new ApplicationsAdapter(this, mCursor);
-
-			mScrollX = getListView().getScrollX();
-			mScrollY = getListView().getScrollY();
-			setListAdapter(mAdapter);
+			mCursor = mDatabase.query(false, "submenus_entries", new String[] { "_id", "name", "intent", "submenu" }, null, null, null, null, "Upper(submenu)", null);
 			
-			getListView().setOnHierarchyChangeListener(new OnHierarchyChangeListener() {
-				public void onChildViewAdded(View parent, View child) {
-					getListView().scrollTo(mScrollX, mScrollY);
-				}
-				
-				public void onChildViewRemoved(View parent, View child) {
-				}
-			});
+			if(mAdapter == null)
+			{
+				mAdapter = new ApplicationsAdapter(this, mCursor);
+				setListAdapter(mAdapter);
+			}
+			else
+				((ApplicationsAdapter)this.getListAdapter()).changeCursor(mCursor);
+			
 		} catch(SQLiteException e) {
 			Log.d("SubMenuSettings", "Error: "+e.getMessage());
 			
 		}
-	}
-
-	@Override
-	protected void onResume()
-	{
-		refreshCursor();
-		super.onResume();
 	}
 	
 	@Override
@@ -260,19 +339,6 @@ public class SubMenuSettings extends ListActivity {
         
         mListView = (ListView) findViewById(android.R.id.list);
         mInflater = getLayoutInflater();
-        
-        SubMenuDBHelper hlp = new SubMenuDBHelper(this); 
-        mDatabase = hlp.getWritableDatabase();
-
-    	Log.d("SubMenuSettings", "Loaded db "+mDatabase.getPath());
-
-		InsertAllApps();
-
-        refreshCursor();
-        
-        refreshMenuList(mDatabase);
-
-        Log.d("SubMenuSettings", "Count: "+mCursorSubMenus.getCount());
         
         mListView.setOnCreateContextMenuListener(
         		new OnCreateContextMenuListener()
@@ -296,6 +362,27 @@ public class SubMenuSettings extends ListActivity {
 	}
 	
 	@Override
+	public void onResume()
+	{
+		super.onResume();
+		
+		dlg = ProgressDialog.show(this, "Loading apps data", "");
+		
+		SubMenuDBHelper hlp = new SubMenuDBHelper(this, false); 
+        mDatabase = hlp.getWritableDatabase();
+
+    	Log.d("SubMenuSettings", "Loaded db "+mDatabase.getPath());
+
+		InsertAllApps();
+
+        refreshCursor();
+        
+        refreshMenuList(mDatabase);
+        
+        dlg.cancel();
+	}
+	
+	@Override
 	public void onDestroy()
 	{
 		super.onDestroy();
@@ -316,6 +403,9 @@ public class SubMenuSettings extends ListActivity {
 	
 	public static void refreshMenuList(SQLiteDatabase db)
 	{
+		dlg.setTitle("Refreshing menu list...");
+		dlg.setMessage("Please wait...");
+		
 		if(mCursorSubMenus != null)
 			mCursorSubMenus.close();
 		if(db != null)
@@ -397,6 +487,8 @@ public class SubMenuSettings extends ListActivity {
 	
 	void InsertAllApps()
 	{
+		dlg.setTitle("Checking for unknown apps...");
+		dlg.setMessage("Please wait...");
 		final Intent mainIntent = new Intent(Intent.ACTION_MAIN, null);
         mainIntent.addCategory(Intent.CATEGORY_LAUNCHER);
 		PackageManager manager = this.getPackageManager();
@@ -417,6 +509,8 @@ public class SubMenuSettings extends ListActivity {
 
             application.setActivity(componentName,
                     Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+            
+    		dlg.setMessage(application.title.toString());
             
         	MoveApplication("MainMenu", application.title.toString(), application.intent.toURI(), true);
         }
