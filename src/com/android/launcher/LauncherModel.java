@@ -47,6 +47,7 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Process;
 import android.util.Log;
+import android.view.ViewGroup;
 
 import com.android.launcher.ExtendedDrawerSettings.ExtendedDrawerDBHelper;
 import com.android.launcher.SubMenuSettings.SubMenuDBHelper;
@@ -481,6 +482,27 @@ public class LauncherModel {
                 Utilities.createIconThumbnail(info.activityInfo.loadIcon(manager), context);
         application.filtered = false;
     }
+    
+    public void openSubMenu(String title) {
+        SubMenu menu = new SubMenu(SubMenuSettings.activeLauncher);
+    	
+        menu.setDragger(SubMenuSettings.activeLauncher.getDragController());
+
+        SubMenuSettings.activeLauncher.getWorkspace().addInScreen(menu, Launcher.getScreen(), 0, 0, 4, 4);
+        menu.onOpen(SubMenuSettings.activeLauncher, title);
+        
+        menu.requestFocus();
+        SubMenuSettings.activeLauncher.closeAllApplications();
+    }
+    
+    public void closeSubMenu(SubMenu menu)
+    {
+    	ViewGroup parent = (ViewGroup) menu.getParent();
+        if (parent != null) {
+            parent.removeView(menu);
+        }
+        menu.onClose();
+    }
 
     private class ApplicationsLoader implements Runnable {
         private final WeakReference<Launcher> mLauncher;
@@ -537,7 +559,7 @@ public class LauncherModel {
                 
                 ExtendedDrawerDBHelper hlp = new ExtendedDrawerDBHelper(context); 
                 mDatabase = hlp.getWritableDatabase();
-                SubMenuDBHelper subhlp = new SubMenuDBHelper(context);
+                SubMenuDBHelper subhlp = new SubMenuDBHelper(context, true);
                 msmDatabase = subhlp.getWritableDatabase();
 
             	Log.d("SubMenu", "Loaded db "+msmDatabase.getPath());
@@ -574,6 +596,8 @@ public class LauncherModel {
 	                    launchIntent.putExtra("com.android.launcher.Extended.SubMenu", info.title);
 	                	
 	                	info.intent = launchIntent;
+	                	
+	                	info.isSubMenu = true;
 
                 		Log.d("SubMenu", "Adding..."+info.title);
 	                	if (menuAction.add(info) && !mStopped) {

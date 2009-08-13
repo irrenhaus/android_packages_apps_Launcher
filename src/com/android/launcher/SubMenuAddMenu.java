@@ -21,7 +21,7 @@ public class SubMenuAddMenu extends Activity {
 		final EditText menuName = (EditText)findViewById(R.id.menuName);
 		
 		buttonOK.setText("OK");
-		buttonCancel.setText("Cancel");
+		buttonCancel.setText("Quit");
 		
 		buttonOK.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {

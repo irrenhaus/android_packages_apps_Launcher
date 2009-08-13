@@ -53,6 +53,9 @@ class ApplicationInfo extends ItemInfo {
      * or from a custom Bitmap (if true.)
      */
     boolean customIcon;
+    
+    // irrenhaus@xda
+    boolean isSubMenu;
 
     /**
      * If isShortcut=true and customIcon=false, this contains a reference to the
@@ -62,6 +65,7 @@ class ApplicationInfo extends ItemInfo {
 
     ApplicationInfo() {
         itemType = LauncherSettings.Favorites.ITEM_TYPE_SHORTCUT;
+        isSubMenu = false;
     }
     
     public ApplicationInfo(ApplicationInfo info) {
@@ -76,6 +80,7 @@ class ApplicationInfo extends ItemInfo {
         icon = info.icon;
         filtered = info.filtered;
         customIcon = info.customIcon;
+        isSubMenu = info.isSubMenu;
     }
 
     /**

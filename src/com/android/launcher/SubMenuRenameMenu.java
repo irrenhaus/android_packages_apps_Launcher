@@ -26,7 +26,7 @@ public class SubMenuRenameMenu extends Activity {
 			menuName.setText(name);
 		
 		buttonOK.setText("OK");
-		buttonCancel.setText("Cancel");
+		buttonCancel.setText("Quit");
 		
 		buttonOK.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
