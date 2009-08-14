@@ -106,9 +106,16 @@ public class SubMenu extends LinearLayout implements OnItemClickListener, OnItem
 			int yOffset, Object dragInfo) {
 		final ItemInfo item = (ItemInfo) dragInfo;
         final int itemType = item.itemType;
-        final ApplicationInfo appInfo = (ApplicationInfo) dragInfo;
+        
+        if(dragInfo instanceof ApplicationInfo)
+        {
+        	ApplicationInfo appInfo = (ApplicationInfo) dragInfo;
+        	if(appInfo.isSubMenu)
+        		return false;
+        }
+        
         return (itemType == LauncherSettings.Favorites.ITEM_TYPE_APPLICATION ||
-                itemType == LauncherSettings.Favorites.ITEM_TYPE_SHORTCUT) && !appInfo.isSubMenu;
+                itemType == LauncherSettings.Favorites.ITEM_TYPE_SHORTCUT);
 	}
 
 	public Rect estimateDropLocation(DragSource source, int x, int y,
@@ -137,6 +144,14 @@ public class SubMenu extends LinearLayout implements OnItemClickListener, OnItem
 
 	public void onDrop(DragSource source, int x, int y, int xOffset,
 			int yOffset, Object dragInfo) {
+		
+		if(dragInfo instanceof ApplicationInfo)
+        {
+        	ApplicationInfo appInfo = (ApplicationInfo) dragInfo;
+        	if(appInfo.isSubMenu)
+        		return;
+        }
+		
 		final ApplicationInfo item = (ApplicationInfo) dragInfo;
         SubMenuDBHelper hlp = new SubMenuDBHelper(context, false);
         SQLiteDatabase db = hlp.getWritableDatabase();

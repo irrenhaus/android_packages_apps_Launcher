@@ -37,6 +37,7 @@ import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.widget.Scroller;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.os.Parcelable;
 import android.os.Parcel;
 
@@ -936,6 +937,16 @@ public class Workspace extends ViewGroup implements DropTarget, DragSource, Drag
     }
 
     public void onDrop(DragSource source, int x, int y, int xOffset, int yOffset, Object dragInfo) {
+    	if(dragInfo instanceof ApplicationInfo)
+    	{
+    		ApplicationInfo appInfo = (ApplicationInfo)dragInfo;
+    		if(appInfo.isSubMenu)
+    		{
+    			Toast.makeText(this.getContext(), "Sorry, no dropping of sub menus!", Toast.LENGTH_SHORT).show();
+    			return;
+    		}
+    	}
+    	
         final CellLayout cellLayout = getCurrentDropLayout();
         if (source != this) {
             onDropExternal(x - xOffset, y - yOffset, dragInfo, cellLayout);
@@ -980,6 +991,16 @@ public class Workspace extends ViewGroup implements DropTarget, DragSource, Drag
     
     private void onDropExternal(int x, int y, Object dragInfo, CellLayout cellLayout,
             boolean insertAtFirst) {
+    	if(dragInfo instanceof ApplicationInfo)
+    	{
+    		ApplicationInfo appInfo = (ApplicationInfo)dragInfo;
+    		if(appInfo.isSubMenu)
+    		{
+    			Toast.makeText(this.getContext(), "Sorry, no dropping of sub menus!", Toast.LENGTH_SHORT).show();
+    			return;
+    		}
+    	}
+    	
         // Drag from somewhere else
         ItemInfo info = (ItemInfo) dragInfo;
 
