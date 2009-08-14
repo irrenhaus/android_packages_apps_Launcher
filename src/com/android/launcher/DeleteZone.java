@@ -16,25 +16,26 @@
 
 package com.android.launcher;
 
-import com.android.launcher.ExtendedDrawerSettings.ExtendedDrawerDBHelper;
-import android.widget.ImageView;
-import android.widget.Toast;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
 import android.graphics.Rect;
-import android.util.AttributeSet;
-import android.view.View;
-import android.view.animation.TranslateAnimation;
-import android.view.animation.Animation;
-import android.view.animation.AnimationSet;
-import android.view.animation.AccelerateInterpolator;
-import android.view.animation.AlphaAnimation;
 import android.graphics.RectF;
 import android.graphics.drawable.TransitionDrawable;
+import android.util.AttributeSet;
+import android.view.View;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import android.view.animation.AnimationSet;
+import android.view.animation.TranslateAnimation;
+import android.widget.ImageView;
+import android.widget.Toast;
+
+import com.android.launcher.ExtendedDrawerSettings.ExtendedDrawerDBHelper;
+import com.android.launcher.SubMenuSettings.SubMenuDBHelper;
 
 public class DeleteZone extends ImageView implements DropTarget, DragController.DragListener {
     private static final int ORIENTATION_HORIZONTAL = 1;
@@ -95,8 +96,25 @@ public class DeleteZone extends ImageView implements DropTarget, DragController.
         final ItemInfo item = (ItemInfo) dragInfo;
 
 		Toast toast;        
+		
+        //irrenhaus
+        if(item instanceof ApplicationInfo && source instanceof SubMenu)
+        {
+        	ApplicationInfo appInfo = (ApplicationInfo)item;
+        	
+        	SubMenuDBHelper hlp = new SubMenuDBHelper(this.getContext(), false);
+        	SQLiteDatabase db = hlp.getWritableDatabase();
+        	SubMenuSettings.MoveApplication(db, "MainMenu", appInfo.title.toString(), appInfo.intent.toURI(), false);
+        	
+        	Toast.makeText(this.getContext(), "Application '"+appInfo.title+"' has been moved to MainMenu", Toast.LENGTH_SHORT).show();
+        
+        	db.close();
+        	
+        	Launcher.getModel().loadApplications(false, SubMenuSettings.activeLauncher, false);
+        }
+		
         /* Rogro82@xda Extended : Check for application drawer items on delete and if so add them to the database */
-        if (item.container == ItemInfo.NO_ID)
+        else if (item.container == ItemInfo.NO_ID)
         {
         	if (item instanceof ApplicationInfo)
         	{
