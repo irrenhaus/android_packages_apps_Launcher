@@ -1,6 +1,8 @@
 package com.android.launcher;
 
 import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Rect;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,10 +10,13 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.GridView;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
 
-public class SubMenu extends LinearLayout implements OnItemClickListener, OnItemLongClickListener, DragSource {
+import com.android.launcher.SubMenuSettings.SubMenuDBHelper;
+
+public class SubMenu extends LinearLayout implements OnItemClickListener, OnItemLongClickListener, DragSource, DropTarget {
 	public SubMenu(Context context) {
 		super(context);
 		this.context = context;
@@ -21,6 +26,7 @@ public class SubMenu extends LinearLayout implements OnItemClickListener, OnItem
 	private Context context = null;
 	private SubMenuAdapter adapter = null;
 	private DragController mDragger = null;
+	private GridView content = null;
 	
 	public void onOpen(Context c, String t) {
         
@@ -35,7 +41,7 @@ public class SubMenu extends LinearLayout implements OnItemClickListener, OnItem
         Log.d("SubMenu", "Opened submenu "+title);
         
         Button closeButton = (Button)findViewById(R.id.close);
-        GridView content = (GridView)findViewById(R.id.content);
+        content = (GridView)findViewById(R.id.content);
         
         adapter = new SubMenuAdapter(context, 0);
         
@@ -89,11 +95,56 @@ public class SubMenu extends LinearLayout implements OnItemClickListener, OnItem
     }
 
 	public void onDropCompleted(View target, boolean success) {
-		// TODO Auto-generated method stub
 		
 	}
 
 	public void setDragger(DragController dragger) {
 		mDragger = dragger;
+	}
+
+	public boolean acceptDrop(DragSource source, int x, int y, int xOffset,
+			int yOffset, Object dragInfo) {
+		final ItemInfo item = (ItemInfo) dragInfo;
+        final int itemType = item.itemType;
+        final ApplicationInfo appInfo = (ApplicationInfo) dragInfo;
+        return (itemType == LauncherSettings.Favorites.ITEM_TYPE_APPLICATION ||
+                itemType == LauncherSettings.Favorites.ITEM_TYPE_SHORTCUT) && !appInfo.isSubMenu;
+	}
+
+	public Rect estimateDropLocation(DragSource source, int x, int y,
+			int xOffset, int yOffset, Object dragInfo, Rect recycle) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public void onDragEnter(DragSource source, int x, int y, int xOffset,
+			int yOffset, Object dragInfo) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void onDragExit(DragSource source, int x, int y, int xOffset,
+			int yOffset, Object dragInfo) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void onDragOver(DragSource source, int x, int y, int xOffset,
+			int yOffset, Object dragInfo) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void onDrop(DragSource source, int x, int y, int xOffset,
+			int yOffset, Object dragInfo) {
+		final ApplicationInfo item = (ApplicationInfo) dragInfo;
+        SubMenuDBHelper hlp = new SubMenuDBHelper(context, false);
+        SQLiteDatabase db = hlp.getWritableDatabase();
+        SubMenuSettings.MoveApplication(db, this.title, item.title.toString(), item.intent.toURI(), false);
+        Launcher.getModel().loadApplications(false, SubMenuSettings.activeLauncher, false);
+        adapter.clear();
+        adapter.generateAppsList(title);
+
+    	Toast.makeText(this.getContext(), "Application '"+item.title+"' has been moved to '"+title+"'", Toast.LENGTH_SHORT).show();
 	}
 }

@@ -414,7 +414,14 @@ public class SubMenuSettings extends ListActivity {
 		
 	void MoveApplication(String menu, String name, String intent, boolean insert)
 	{
-		Cursor fix = mDatabase.query(false, "submenus_entries", new String[] { "_id", "name", "intent", "submenu" }, "name = '"+name+"'", null, null, null, null, null);
+		SubMenuSettings.MoveApplication(mDatabase, menu, name, intent, insert);
+
+		refreshCursor();
+	}
+	
+	public static void MoveApplication(SQLiteDatabase db, String menu, String name, String intent, boolean insert)
+	{
+		Cursor fix = db.query(false, "submenus_entries", new String[] { "_id", "name", "intent", "submenu" }, "name = '"+name+"'", null, null, null, null, null);
 			
 		try
 		{
@@ -427,6 +434,7 @@ public class SubMenuSettings extends ListActivity {
 			}
 		} catch (Exception e)
 		{
+			fix.close();
 			Log.d("SubMenuSettings", "Error at "+name);
 		}
 		
@@ -434,7 +442,7 @@ public class SubMenuSettings extends ListActivity {
 		
 		if(insert)
 		{
-			Cursor tmp = mDatabase.query(false, "submenus_entries", new String[] { "_id", "name", "intent" }, "intent = '"+intent+"'", null, null, null, null, null);
+			Cursor tmp = db.query(false, "submenus_entries", new String[] { "_id", "name", "intent" }, "intent = '"+intent+"'", null, null, null, null, null);
 	        
 			while(tmp.moveToNext())
 			{
@@ -459,13 +467,13 @@ public class SubMenuSettings extends ListActivity {
 			
 			if(insert)
 			{
-				mDatabase.insert("submenus_entries", null, values);
+				db.insert("submenus_entries", null, values);
 			}
 			else
 			{
 				if(intent != null)
 				{
-					if(mDatabase.update("submenus_entries", values, "intent = '"+intent+"' AND name = '"+name+"'", null) <= 0)
+					if(db.update("submenus_entries", values, "intent = '"+intent+"' AND name = '"+name+"'", null) <= 0)
 					{
 						Log.d("MoveApplication", "update <= 0");
 					}
@@ -474,7 +482,7 @@ public class SubMenuSettings extends ListActivity {
 				}
 				else if(name != null)
 				{
-					if(mDatabase.update("submenus_entries", values, "name = '"+name+"'", null) <= 0)
+					if(db.update("submenus_entries", values, "name = '"+name+"'", null) <= 0)
 					{
 						Log.d("MoveApplication", "update <= 0");
 					}
@@ -483,7 +491,6 @@ public class SubMenuSettings extends ListActivity {
 				}
 			}
 			
-			refreshCursor();
 		}catch(SQLiteException e) {
 			Log.d("SubMenuSettings", "Error: "+e.getMessage());
 		}
