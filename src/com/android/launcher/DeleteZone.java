@@ -122,7 +122,7 @@ public class DeleteZone extends ImageView implements DropTarget, DragController.
         	{
         		final ApplicationInfo application = (ApplicationInfo) item;
         		
-        		if(application.isSubMenu())
+        		if(application.isSubMenu)
         		{
         			Toast.makeText(this.getContext(), "Sorry, no dropping of sub menus!", Toast.LENGTH_SHORT).show();
         		}
