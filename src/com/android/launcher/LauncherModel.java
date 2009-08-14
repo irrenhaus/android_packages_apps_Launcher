@@ -24,10 +24,11 @@ import java.lang.ref.WeakReference;
 import java.net.URISyntaxException;
 import java.text.Collator;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import android.content.ComponentName;
 import android.content.ContentResolver;
@@ -540,6 +541,8 @@ public class LauncherModel {
         public void run() {
             mRunning = true;
 
+            long startTime = System.currentTimeMillis();
+            
             // Elevate priority when Home launches for the first time to avoid
             // starving at boot time. Staring at a blank home is not cool.
             android.os.Process.setThreadPriority(mIsLaunching ? Process.THREAD_PRIORITY_DEFAULT :
@@ -563,20 +566,12 @@ public class LauncherModel {
                 
                 Context context = launcher;
                 
+                long submenuStartTime = System.currentTimeMillis();
+                
                 ExtendedDrawerDBHelper hlp = new ExtendedDrawerDBHelper(context); 
                 mDatabase = hlp.getWritableDatabase();
-                SubMenuDBHelper subhlp = new SubMenuDBHelper(context, true);
+                SubMenuDBHelper subhlp = new SubMenuDBHelper(context, false);
                 msmDatabase = subhlp.getWritableDatabase();
-
-            	Log.d("SubMenu", "Loaded db "+msmDatabase.getPath());
-            	Log.d("SubMenu", "Other db is "+mDatabase.getPath());
-                
-                if(msmDatabase.isOpen())
-                {
-                	Log.d("SubMenu", "DB opened!");
-                	
-                	
-                }
 
                 //irrenhaus@xda: get submenus and add them to the menu
                 try {
@@ -605,9 +600,7 @@ public class LauncherModel {
 	                	
 	                	info.isSubMenu = true;
 
-                		Log.d("SubMenu", "Adding..."+info.title);
 	                	if (action.add(info) && !mStopped) {
-	                		Log.d("SubMenu", "Added! "+info.title);
 	                        //launcher.runOnUiThread(action);
 	                        //action = new ChangeNotifier(applicationList, false);
 	                    }
@@ -620,34 +613,51 @@ public class LauncherModel {
                 	Log.d("SubMenu", e.getMessage());
                 }
                 
+                Log.d("SubMenu", "SubMenu loading time: "+(System.currentTimeMillis()-submenuStartTime));
+                
+                long databaseStartTime = System.currentTimeMillis();
+                
+                //Fasten up the app loading
+                
+                List<String> hiddenData = new LinkedList<String>();
+                Cursor eCursor = mDatabase.query(false, "extendeddrawer_hidden", new String[] { "_id", "name", "intent" }, null, null, null, null, null, null);
+                while(eCursor.moveToNext())
+                {
+                	hiddenData.add(eCursor.getString(eCursor.getColumnIndex("intent")));
+                }
+                eCursor.close();
+                
+                Map<String, String> submenuData = new HashMap<String, String>();
+                Cursor sub = msmDatabase.query(false, "submenus_entries", new String[] { "_id", "name", "intent", "submenu" }, null, null, null, null, null, null);
+                while(sub.moveToNext())
+                {
+                	submenuData.put(sub.getString(sub.getColumnIndex("intent")),
+                			        sub.getString(sub.getColumnIndex("submenu")));
+                }
+                sub.close();
+                
+                mDatabase.close();
+                msmDatabase.close();
+                
+                Log.d("SubMenu", "Database reading time: "+(System.currentTimeMillis()-databaseStartTime));
+                
+                long addingTime = System.currentTimeMillis();
+                
                 for (int i = 0; i < count && !mStopped; i++) {
                     ResolveInfo info = apps.get(i);
                     ApplicationInfo application =
                         makeAndCacheApplicationInfo(manager, appInfoCache, info, launcher);
 
-                    Cursor eCursor = mDatabase.query(false, "extendeddrawer_hidden", new String[] { "_id", "name", "intent" }, "intent='" + application.intent.toURI() + "'", null, null, null, null, null);
-                    
                     //irrenhaus@xda: check if it should be in the main menu
-                    Cursor sub = null;
-                    try {
-                    sub = msmDatabase.query(false, "submenus_entries", new String[] { "_id", "name", "intent", "submenu" }, "intent='" + application.intent.toURI() + "'", null, null, null, null, null);
-                    } catch(SQLiteException e) {
-                    	Log.d("SubMenu", e.getMessage());
-                    }
+                    
                     String subMenu = null;
                     
                     //Only show if its not in the appdrawer table
-                    if(eCursor.getCount()==0) {
+                    if(!hiddenData.contains(application.intent.toURI())) {
                     	//irrenhaus@xda: check for submenu. if it is not in the db, add it to main menu
-                    	if(sub != null && sub.getCount() > 0)
+                    	if(submenuData.containsKey(application.intent.toURI()))
                     	{
-                    		while(sub.moveToNext() && !mStopped)
-                    		{
-                    			String n = sub.getString(1);
-                    			String s = sub.getString(3);
-                    			
-                    			subMenu = sub.getString(sub.getColumnIndex("submenu"));
-                    		}
+                    		subMenu = submenuData.get(application.intent.toURI());
                         }
                     	
                     	if ((subMenu == null || subMenu.equals("MainMenu")) && action.add(application) && !mStopped) {
@@ -655,14 +665,7 @@ public class LauncherModel {
                             //action = new ChangeNotifier(applicationList, false);
                         }
                     }
-
-                    eCursor.close();
-                    sub.close();
                 }
-
-                
-                mDatabase.close();
-                msmDatabase.close();
                 
                 launcher.runOnUiThread(new Runnable() {
 					public void run() {
@@ -671,6 +674,9 @@ public class LauncherModel {
 		                model.dropApplications();
 					}
                 });
+                
+                Log.d("SubMenu", "Adding apps time: "+(System.currentTimeMillis()-addingTime));
+                Log.d("SubMenu", "Overall loading time: "+(System.currentTimeMillis()-startTime));
 
                 launcher.runOnUiThread(action);
             }
