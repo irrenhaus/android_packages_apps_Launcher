@@ -558,8 +558,7 @@ public class LauncherModel {
                 // Do not access without checking for null first
                 final ApplicationsAdapter applicationList = mApplicationsAdapter;
 
-                ChangeNotifier menuAction = new ChangeNotifier(applicationList, true);
-                ChangeNotifier appAction = new ChangeNotifier(applicationList, false);
+                ChangeNotifier action = new ChangeNotifier(applicationList, true);
                 final HashMap<ComponentName, ApplicationInfo> appInfoCache = mAppInfoCache;
                 
                 Context context = launcher;
@@ -607,7 +606,7 @@ public class LauncherModel {
 	                	info.isSubMenu = true;
 
                 		Log.d("SubMenu", "Adding..."+info.title);
-	                	if (menuAction.add(info) && !mStopped) {
+	                	if (action.add(info) && !mStopped) {
 	                		Log.d("SubMenu", "Added! "+info.title);
 	                        //launcher.runOnUiThread(action);
 	                        //action = new ChangeNotifier(applicationList, false);
@@ -651,7 +650,7 @@ public class LauncherModel {
                     		}
                         }
                     	
-                    	if ((subMenu == null || subMenu.equals("MainMenu")) && appAction.add(application) && !mStopped) {
+                    	if ((subMenu == null || subMenu.equals("MainMenu")) && action.add(application) && !mStopped) {
                             //launcher.runOnUiThread(action);
                             //action = new ChangeNotifier(applicationList, false);
                         }
@@ -673,8 +672,7 @@ public class LauncherModel {
 					}
                 });
 
-                launcher.runOnUiThread(menuAction);
-                launcher.runOnUiThread(appAction);
+                launcher.runOnUiThread(action);
             }
 
             if (!mStopped) {
@@ -710,7 +708,7 @@ public class LauncherModel {
             final ArrayList<ApplicationInfo> buffer = mBuffer;
             final int count = buffer.size();
 
-            Collections.sort(buffer, new ApplicationInfoComparator());
+            //Collections.sort(buffer, new ApplicationInfoComparator());
             
             for (int i = 0; i < count; i++) {
                 applicationList.setNotifyOnChange(false);
@@ -719,7 +717,7 @@ public class LauncherModel {
 
             buffer.clear();
 
-            //applicationList.sort(new ApplicationInfoComparator());
+            applicationList.sort(new ApplicationInfoComparator());
             applicationList.notifyDataSetChanged();
         }
 
@@ -732,6 +730,11 @@ public class LauncherModel {
 
     private static class ApplicationInfoComparator implements Comparator<ApplicationInfo> {
         public final int compare(ApplicationInfo a, ApplicationInfo b) {
+        	if(a.isSubMenu && ! b.isSubMenu)
+        		return -1;
+        	if(!a.isSubMenu && b.isSubMenu)
+        		return 1;
+        	
             return sCollator.compare(a.title.toString(), b.title.toString());
         }
     }
