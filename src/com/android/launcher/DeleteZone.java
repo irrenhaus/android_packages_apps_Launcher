@@ -122,34 +122,40 @@ public class DeleteZone extends ImageView implements DropTarget, DragController.
         	{
         		final ApplicationInfo application = (ApplicationInfo) item;
         		
-        		ExtendedDrawerDBHelper hlp = new ExtendedDrawerDBHelper(this.getContext());                 
-                mDatabase = hlp.getWritableDatabase(); 
-
-                Cursor eCursor = mDatabase.query(false, "extendeddrawer_hidden", new String[] { "_id", "name", "intent" }, "intent='" + application.intent.toURI() + "'", null, null, null, null, null);
-
-                //Only show if its not in the appdrawer table
-                if(eCursor.getCount()==0)
-                {
-                
-                ContentValues insertValues = new ContentValues();
-		        insertValues.put("name", (String) application.title);
-		        insertValues.put("intent", application.intent.toURI());
-		        mDatabase.insert("extendeddrawer_hidden", "", insertValues);
-		        
-                }
-
-                eCursor.close();
-                mDatabase.close();
-                
-                toast = Toast.makeText(this.getContext(), "Application '" + application.title + "' has been hidden from the application drawer.", Toast.LENGTH_SHORT);
-            	toast.show();
+        		if(application.isSubMenu())
+        		{
+        			Toast.makeText(this.getContext(), "Sorry, no dropping of sub menus!", Toast.LENGTH_SHORT).show();
+        		}
+        		else
+        		{
+	        		ExtendedDrawerDBHelper hlp = new ExtendedDrawerDBHelper(this.getContext());                 
+	                mDatabase = hlp.getWritableDatabase(); 
+	
+	                Cursor eCursor = mDatabase.query(false, "extendeddrawer_hidden", new String[] { "_id", "name", "intent" }, "intent='" + application.intent.toURI() + "'", null, null, null, null, null);
+	
+	                //Only show if its not in the appdrawer table
+	                if(eCursor.getCount()==0)
+	                {
+	                
+	                ContentValues insertValues = new ContentValues();
+			        insertValues.put("name", (String) application.title);
+			        insertValues.put("intent", application.intent.toURI());
+			        mDatabase.insert("extendeddrawer_hidden", "", insertValues);
+			        
+	                }
+	
+	                eCursor.close();
+	                mDatabase.close();
+	                
+	                toast = Toast.makeText(this.getContext(), "Application '" + application.title + "' has been hidden from the application drawer.", Toast.LENGTH_SHORT);
+	            	toast.show();
+	            	
+	                final LauncherModel model = Launcher.getModel();
+	
+	                model.dropApplications();
+	                model.loadApplications(false, mLauncher, false);
             	
-                final LauncherModel model = Launcher.getModel();
-
-                model.dropApplications();
-                model.loadApplications(false, mLauncher, false);
-            	
-            	
+        		}
         	}
         	
         	return;
