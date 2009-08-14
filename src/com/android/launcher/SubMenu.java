@@ -156,7 +156,10 @@ public class SubMenu extends LinearLayout implements OnItemClickListener, OnItem
         SubMenuDBHelper hlp = new SubMenuDBHelper(context, false);
         SQLiteDatabase db = hlp.getWritableDatabase();
         SubMenuSettings.MoveApplication(db, this.title, item.title.toString(), item.intent.toURI(), false);
-        Launcher.getModel().loadApplications(false, SubMenuSettings.activeLauncher, false);
+        //Launcher.getModel().loadApplications(false, SubMenuSettings.activeLauncher, false);
+        //Launcher.getModel().removeApplicationInfo(item);
+        Launcher.getModel().dropApplicationCache();
+        Launcher.getModel().removeApplicationInfo(item);
         adapter.clear();
         adapter.generateAppsList(title);
 

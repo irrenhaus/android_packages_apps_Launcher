@@ -239,6 +239,48 @@ public class LauncherModel {
             }
         }
     }
+    
+    synchronized void addApplicationInfo(ApplicationInfo info)
+    {
+    	final ApplicationsAdapter adapter = mApplicationsAdapter;
+    	
+    	final HashMap<ComponentName, ApplicationInfo> cache = mAppInfoCache;
+        adapter.setNotifyOnChange(false);
+        adapter.add(info);
+        adapter.sort(new ApplicationInfoComparator());
+        adapter.notifyDataSetChanged();
+    }
+    
+    synchronized void removeApplicationInfo(ApplicationInfo info)
+    {
+    	if (mApplicationsLoader != null && mApplicationsLoader.isRunning()) {
+            dropApplicationCache(); // TODO: this could be optimized
+            startApplicationsLoader(SubMenuSettings.activeLauncher, false);
+            return;
+        }
+    	
+    	final ApplicationsAdapter adapter = mApplicationsAdapter;
+    	
+    	ApplicationInfo delete = null;
+    	
+    	for(int i = 0; i < adapter.getCount(); i++)
+    	{
+    		ApplicationInfo cmp = adapter.getItem(i);
+    		
+    		if(cmp.intent.toURI().equals(info.intent.toURI()))
+    			delete = cmp;
+    	}
+    	
+    	if(delete == null)
+    		delete = info;
+    	
+    	final HashMap<ComponentName, ApplicationInfo> cache = mAppInfoCache;
+        adapter.setNotifyOnChange(false);
+        cache.remove(delete.intent.getComponent());
+        adapter.remove(delete);
+        adapter.sort(new ApplicationInfoComparator());
+        adapter.notifyDataSetChanged();
+    }
 
     synchronized void updatePackage(Launcher launcher, String packageName) {
         if (mApplicationsLoader != null && mApplicationsLoader.isRunning()) {
@@ -457,7 +499,7 @@ public class LauncherModel {
                 info.activityInfo.applicationInfo.packageName,
                 info.activityInfo.name);
         ApplicationInfo application = appInfoCache.get(componentName);
-
+        
         if (application == null) {
             application = new ApplicationInfo();
             application.container = ItemInfo.NO_ID;
@@ -566,8 +608,6 @@ public class LauncherModel {
                 
                 Context context = launcher;
                 
-                long submenuStartTime = System.currentTimeMillis();
-                
                 ExtendedDrawerDBHelper hlp = new ExtendedDrawerDBHelper(context); 
                 mDatabase = hlp.getWritableDatabase();
                 SubMenuDBHelper subhlp = new SubMenuDBHelper(context, false);
@@ -613,9 +653,6 @@ public class LauncherModel {
                 	Log.d("SubMenu", e.getMessage());
                 }
                 
-                Log.d("SubMenu", "SubMenu loading time: "+(System.currentTimeMillis()-submenuStartTime));
-                
-                long databaseStartTime = System.currentTimeMillis();
                 
                 //Fasten up the app loading
                 
@@ -639,15 +676,14 @@ public class LauncherModel {
                 mDatabase.close();
                 msmDatabase.close();
                 
-                Log.d("SubMenu", "Database reading time: "+(System.currentTimeMillis()-databaseStartTime));
-                
                 long addingTime = System.currentTimeMillis();
                 
                 for (int i = 0; i < count && !mStopped; i++) {
                     ResolveInfo info = apps.get(i);
+                    
                     ApplicationInfo application =
                         makeAndCacheApplicationInfo(manager, appInfoCache, info, launcher);
-
+                    
                     //irrenhaus@xda: check if it should be in the main menu
                     
                     String subMenu = null;
@@ -655,10 +691,7 @@ public class LauncherModel {
                     //Only show if its not in the appdrawer table
                     if(!hiddenData.contains(application.intent.toURI())) {
                     	//irrenhaus@xda: check for submenu. if it is not in the db, add it to main menu
-                    	if(submenuData.containsKey(application.intent.toURI()))
-                    	{
-                    		subMenu = submenuData.get(application.intent.toURI());
-                        }
+                    	subMenu = submenuData.get(application.intent.toURI());
                     	
                     	if ((subMenu == null || subMenu.equals("MainMenu")) && action.add(application) && !mStopped) {
                             //launcher.runOnUiThread(action);
@@ -701,6 +734,7 @@ public class LauncherModel {
         }
 
         public void run() {
+        	long start = System.currentTimeMillis();
             final ApplicationsAdapter applicationList = mApplicationList;
             // Can be set to null on the UI thread by the unbind() method
             if (applicationList == null) return;
@@ -725,6 +759,8 @@ public class LauncherModel {
 
             applicationList.sort(new ApplicationInfoComparator());
             applicationList.notifyDataSetChanged();
+            
+            Log.d("SubMenu", "ChangeNotifier time: "+(System.currentTimeMillis()-start));
         }
 
         boolean add(ApplicationInfo application) {
