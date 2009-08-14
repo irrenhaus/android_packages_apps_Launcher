@@ -110,7 +110,8 @@ public class DeleteZone extends ImageView implements DropTarget, DragController.
         
         	db.close();
         	
-        	Launcher.getModel().loadApplications(false, SubMenuSettings.activeLauncher, false);
+        	//Launcher.getModel().loadApplications(false, SubMenuSettings.activeLauncher, false);
+        	Launcher.getModel().addApplicationInfo(appInfo);
         }
 		
         /* Rogro82@xda Extended : Check for application drawer items on delete and if so add them to the database */

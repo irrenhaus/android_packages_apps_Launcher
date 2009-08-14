@@ -12,6 +12,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
@@ -368,7 +369,7 @@ public class SubMenuSettings extends ListActivity {
 		
 		dlg = ProgressDialog.show(this, "Loading apps data", "");
 		
-		SubMenuDBHelper hlp = new SubMenuDBHelper(this, false); 
+		SubMenuDBHelper hlp = new SubMenuDBHelper(this, true); 
         mDatabase = hlp.getWritableDatabase();
 
     	Log.d("SubMenuSettings", "Loaded db "+mDatabase.getPath());
@@ -421,7 +422,8 @@ public class SubMenuSettings extends ListActivity {
 	
 	public static void MoveApplication(SQLiteDatabase db, String menu, String name, String intent, boolean insert)
 	{
-		Cursor fix = db.query(false, "submenus_entries", new String[] { "_id", "name", "intent", "submenu" }, "name = '"+name+"'", null, null, null, null, null);
+		
+		Cursor fix = db.query(false, "submenus_entries", new String[] { "_id", "name", "intent", "submenu" }, "name = "+DatabaseUtils.sqlEscapeString(name), null, null, null, null, null);
 			
 		try
 		{
@@ -473,7 +475,7 @@ public class SubMenuSettings extends ListActivity {
 			{
 				if(intent != null)
 				{
-					if(db.update("submenus_entries", values, "intent = '"+intent+"' AND name = '"+name+"'", null) <= 0)
+					if(db.update("submenus_entries", values, "intent = '"+intent+"' AND name = "+DatabaseUtils.sqlEscapeString(name), null) <= 0)
 					{
 						Log.d("MoveApplication", "update <= 0");
 					}
