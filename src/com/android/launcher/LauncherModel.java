@@ -81,6 +81,8 @@ public class LauncherModel {
     private DesktopItemsLoader mDesktopItemsLoader;
     private Thread mApplicationsLoaderThread;
     private Thread mDesktopLoaderThread;
+    
+    private SubMenu currentOpenSubMenu = null;
 
     private final HashMap<ComponentName, ApplicationInfo> mAppInfoCache =
             new HashMap<ComponentName, ApplicationInfo>(INITIAL_ICON_CACHE_CAPACITY);
@@ -484,6 +486,9 @@ public class LauncherModel {
     }
     
     public void openSubMenu(String title) {
+    	if(currentOpenSubMenu != null)
+    		closeSubMenu(currentOpenSubMenu);
+    	
         SubMenu menu = new SubMenu(SubMenuSettings.activeLauncher);
     	
         menu.setDragger(SubMenuSettings.activeLauncher.getDragController());
@@ -493,6 +498,8 @@ public class LauncherModel {
         
         menu.requestFocus();
         SubMenuSettings.activeLauncher.closeAllApplications();
+        
+        currentOpenSubMenu = menu;
     }
     
     public void closeSubMenu(SubMenu menu)
