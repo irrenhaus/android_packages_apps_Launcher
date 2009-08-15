@@ -167,7 +167,7 @@ public class GesturesActivity extends ListActivity {
     @Override
     protected void onPrepareDialog(int id, Dialog dialog) {
         super.onPrepareDialog(id, dialog);
-        if (id == DIALOG_RENAME_GESTURE && mCurrentRenameInfo != null) {
+        if (id == DIALOG_RENAME_GESTURE) {
             mInput.setText(mCurrentRenameInfo.title);
         }
     }
