@@ -25,7 +25,6 @@ import android.graphics.Canvas;
 import android.graphics.PaintFlagsDrawFilter;
 import android.graphics.Paint;
 import android.graphics.Rect;
-import android.util.DisplayMetrics;
 import android.content.res.Resources;
 import android.content.Context;
 
@@ -55,7 +54,6 @@ final class Utilities {
 
             Bitmap centered = Bitmap.createBitmap(bitmapWidth < width ? width : bitmapWidth,
                     bitmapHeight < height ? height : bitmapHeight, Bitmap.Config.RGB_565);
-            centered.setDensity(bitmap.getDensity());
             Canvas canvas = new Canvas(centered);
             canvas.drawColor(color);
             canvas.drawBitmap(bitmap, (width - bitmapWidth) / 2.0f, (height - bitmapHeight) / 2.0f,
@@ -95,11 +93,16 @@ final class Utilities {
             painter.setIntrinsicWidth(width);
             painter.setIntrinsicHeight(height);
         } else if (icon instanceof BitmapDrawable) {
-            // Ensure the bitmap has a density.
+            float displayDensity = context.getResources().getDisplayMetrics().density;
             BitmapDrawable bitmapDrawable = (BitmapDrawable) icon;
             Bitmap bitmap = bitmapDrawable.getBitmap();
-            if (bitmap.getDensity() == Bitmap.DENSITY_NONE) {
-                bitmapDrawable.setTargetDensity(context.getResources().getDisplayMetrics());
+            float iconDensity = bitmap.getDensityScale();
+            scale = displayDensity / iconDensity;
+
+            // Scale the bitmap to the screen density size if it's not loaded at the same density.
+            if (scale != 1.0f) {
+                icon = bitmapDrawable = new BitmapDrawable(bitmap);
+                bitmapDrawable.setDensityScale(scale);
             }
         }
         int iconWidth = icon.getIntrinsicWidth();
