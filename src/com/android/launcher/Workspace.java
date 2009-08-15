@@ -466,7 +466,6 @@ public class Workspace extends ViewGroup implements DropTarget, DragSource, Drag
         }
     }
 
-    @Override
     public boolean isOpaque() {
         return !mWallpaper.hasAlpha();
     }
@@ -634,7 +633,6 @@ public class Workspace extends ViewGroup implements DropTarget, DragSource, Drag
         return super.dispatchUnhandledMove(focused, direction);
     }
 
-    @Override
     public void addFocusables(ArrayList<View> views, int direction, int focusableMode) {
         if (mLauncher.isDrawerDown()) {
             final Folder openFolder = getOpenFolder();
