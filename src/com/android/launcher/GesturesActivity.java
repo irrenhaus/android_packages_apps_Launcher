@@ -81,7 +81,7 @@ public class GesturesActivity extends ListActivity implements AdapterView.OnItem
         setListAdapter(new GesturesSettingsAdapter(mAdapter));
         getListView().setOnItemClickListener(this);
 
-        mStore = Launcher.getGestureLibrary(this);
+        mStore = Launcher.getGestureLibrary();
         mTask = (GesturesLoadTask) new GesturesLoadTask().execute();
 
         registerForContextMenu(getListView());

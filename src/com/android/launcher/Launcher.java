@@ -246,7 +246,11 @@ public final class Launcher extends Activity implements View.OnClickListener, On
         super.onCreate(savedInstanceState);
         mInflater = getLayoutInflater();
 
-        getGestureLibrary(this);
+        if (sLibrary == null) {
+            // The context is not kept by the library so it's safe to do this
+            sLibrary = GestureLibraries.fromPrivateFile(Launcher.this,
+                    GesturesConstants.STORE_NAME);
+        }
 
         mAppWidgetManager = AppWidgetManager.getInstance(this);
 
@@ -1979,11 +1983,7 @@ public final class Launcher extends Activity implements View.OnClickListener, On
         return sModel;
     }
 
-    static GestureLibrary getGestureLibrary(Context context) {
-        if (sLibrary == null) {
-            // The context is not kept by the library so it's safe to do this
-            sLibrary = GestureLibraries.fromPrivateFile(context, GesturesConstants.STORE_NAME);
-        }
+    static GestureLibrary getGestureLibrary() {
         return sLibrary;
     }
 
