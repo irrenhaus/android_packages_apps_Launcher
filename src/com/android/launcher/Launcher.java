@@ -950,12 +950,9 @@ public final class Launcher extends Activity implements View.OnClickListener, On
                     Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT) {
 
                 if (mGesturesPanel != null && mDragLayer.getWindowVisibility() == View.VISIBLE &&
-                        (mDragLayer.hasWindowFocus() ||
-                                (mGesturesWindow != null && mGesturesWindow.isShowing()))) {
-
+                        mDragLayer.hasWindowFocus()) {
                     SearchManager searchManager =
                             (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-
                     if (!searchManager.isVisible()) {
                         onHomeKeyPressed();
                     }
