@@ -594,8 +594,6 @@ public final class Launcher extends Activity implements View.OnClickListener, On
             mRestoring = true;
         }
 
-        mCurrentGesture = (Gesture) savedState.get(RUNTIME_STATE_PENDING_GESTURE);
-
         boolean gesturesShowing = savedState.getBoolean(RUNTIME_STATE_GESTURES_PANEL, false);
         if (gesturesShowing) {
             final Gesture gesture = (Gesture) savedState.get(RUNTIME_STATE_GESTURES_PANEL_GESTURE);
@@ -613,6 +611,8 @@ public final class Launcher extends Activity implements View.OnClickListener, On
                 }
             });
         }
+
+        mCurrentGesture = (Gesture) savedState.get(RUNTIME_STATE_PENDING_GESTURE);
     }
 
     /**
@@ -1136,14 +1136,12 @@ public final class Launcher extends Activity implements View.OnClickListener, On
             outState.putParcelable(RUNTIME_STATE_PENDING_GESTURE, mCurrentGesture);
         }
 
-        if (mGesturesWindow != null && mGesturesWindow.isShowing()) {
+        if (mGesturesWindow != null && mGesturesWindow.isShowing() && isConfigurationChange) {
             outState.putBoolean(RUNTIME_STATE_GESTURES_PANEL, true);
 
-            if (mCurrentGesture == null || !mWaitingForResult) {
-                final Gesture gesture = mGesturesOverlay.getGesture();
-                if (gesture != null) {
-                    outState.putParcelable(RUNTIME_STATE_GESTURES_PANEL_GESTURE, gesture);
-                }
+            final Gesture gesture = mGesturesOverlay.getGesture();
+            if (gesture != null) {
+                outState.putParcelable(RUNTIME_STATE_GESTURES_PANEL_GESTURE, gesture);
             }
         }
     }
@@ -2522,10 +2520,6 @@ public final class Launcher extends Activity implements View.OnClickListener, On
                 mMatcher.gesture = overlay.getGesture();
                 if (mMatcher.gesture.getLength() < GesturesConstants.LENGTH_THRESHOLD) {
                     overlay.clear(false);
-                    if (mGesturesAction.intent != null) {
-                        mGesturesAction.intent = null;
-                        setGesturesNextPrompt(null, getString(R.string.gestures_unknown));
-                    }
                 } else {
                     mMatcher.run();
                 }
@@ -2535,10 +2529,6 @@ public final class Launcher extends Activity implements View.OnClickListener, On
                 mMatcher.gesture = overlay.getGesture();
                 if (mMatcher.gesture.getLength() < GesturesConstants.LENGTH_THRESHOLD) {
                     overlay.clear(false);
-                    if (mGesturesAction.intent != null) {
-                        mGesturesAction.intent = null;
-                        setGesturesNextPrompt(null, getString(R.string.gestures_unknown));
-                    }
                 } else {
                     overlay.postDelayed(mMatcher, GesturesConstants.MATCH_DELAY);
                 }
@@ -2576,7 +2566,6 @@ public final class Launcher extends Activity implements View.OnClickListener, On
                 }
 
                 if (!match){
-                    mGesturesAction.intent = null;
                     if (animate) {
                         setGesturesNextPrompt(null, getString(R.string.gestures_unknown));
                     } else {
@@ -2592,7 +2581,7 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 
         private void updatePrompt(ApplicationInfo info, boolean animate) {
             if (mGesturesAction.intent != null &&
-                    info.intent.toUri(0).equals(mGesturesAction.intent.toUri(0)) &&
+                    info.intent.toURI().equals(mGesturesAction.intent.toURI()) &&
                     info.title.equals(((TextView) mGesturesPrompt.getCurrentView()).getText())) {
                 return;
             }
