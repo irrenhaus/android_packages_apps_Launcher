@@ -447,7 +447,7 @@ public final class Launcher extends Activity implements View.OnClickListener, On
                     try {
                         searchManagerService.stopSearch();
                     } catch (RemoteException e) {
-                        e(LOG_TAG, "error stopping search", e);
+                        Log.e(LOG_TAG, "error stopping search", e);
                     }    
                 }
             });
