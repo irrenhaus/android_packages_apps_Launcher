@@ -22,11 +22,19 @@ import android.content.Intent;
 import android.content.ContentResolver;
 import android.database.Cursor;
 import android.net.Uri;
+import android.widget.Toast;
 
 import java.net.URISyntaxException;
 
 public class UninstallShortcutReceiver extends BroadcastReceiver {
+    private static final String ACTION_UNINSTALL_SHORTCUT =
+            "com.android.launcher.action.UNINSTALL_SHORTCUT";
+
     public void onReceive(Context context, Intent data) {
+        if (!ACTION_UNINSTALL_SHORTCUT.equals(data.getAction())) {
+            return;
+        }
+
         Intent intent = data.getParcelableExtra(Intent.EXTRA_SHORTCUT_INTENT);
         String name = data.getStringExtra(Intent.EXTRA_SHORTCUT_NAME);
         boolean duplicate = data.getBooleanExtra(Launcher.EXTRA_SHORTCUT_DUPLICATE, true);
@@ -62,7 +70,11 @@ public class UninstallShortcutReceiver extends BroadcastReceiver {
                 c.close();
             }
 
-            if (changed) cr.notifyChange(LauncherSettings.Favorites.CONTENT_URI, null);
+            if (changed) {
+                cr.notifyChange(LauncherSettings.Favorites.CONTENT_URI, null);
+                Toast.makeText(context, context.getString(R.string.shortcut_uninstalled, name),
+                        Toast.LENGTH_SHORT).show();
+            }
         }
     }
 }

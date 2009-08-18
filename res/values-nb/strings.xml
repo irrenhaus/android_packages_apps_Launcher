@@ -16,6 +16,8 @@
 <resources xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <string name="application_name">"Hjem"</string>
+    <!-- no translation found for uid_name (3371120195364560632) -->
+    <skip />
     <string name="folder_name">"Mappe"</string>
     <string name="chooser_wallpaper">"Velg bakgrunnsbilde fra"</string>
     <string name="wallpaper_instructions">"Velg bakgrunnsbilde"</string>
@@ -38,12 +40,19 @@
     <string name="add_photo_frame">"Bilderamme"</string>
     <string name="add_search">"Søk"</string>
     <string name="out_of_space">"Ikke nok plass på skrivebordet."</string>
+    <!-- no translation found for shortcut_installed (6623689857689040689) -->
+    <skip />
+    <!-- no translation found for shortcut_uninstalled (2758997515869993129) -->
+    <skip />
+    <!-- no translation found for shortcut_duplicate (4887186782641532074) -->
+    <skip />
     <string name="title_select_shortcut">"Velg snarvei"</string>
     <string name="title_select_live_folder">"Velg mappe"</string>
     <string name="menu_add">"Legg til"</string>
     <string name="menu_wallpaper">"Bakgrunnsbilde"</string>
     <string name="menu_search">"Søk"</string>
     <string name="menu_notifications">"Varslinger"</string>
+    <skip />
     <string name="menu_settings">"Innstillinger"</string>
     <string name="permlab_install_shortcut">"installere snarveier"</string>
     <string name="permdesc_install_shortcut">"Lar applikasjonen legge til snarveier uten å involvere brukeren."</string>
@@ -55,4 +64,22 @@
     <string name="permdesc_write_settings">"Lar applikasjonen endre innstillinger og snarveier på skrivebordet."</string>
     <string name="search_hint">"Google-søk"</string>
     <string name="gadget_error_text">"Problem under lasting av gadget"</string>
+    <skip />
+    <skip />
+    <skip />
+    <skip />
+    <skip />
+    <skip />
+    <skip />
+    <skip />
+    <skip />
+    <skip />
+    <skip />
+    <skip />
+    <skip />
+    <skip />
+    <skip />
+    <skip />
+    <skip />
+    <skip />
 </resources>

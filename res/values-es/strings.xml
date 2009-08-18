@@ -16,6 +16,7 @@
 <resources xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <string name="application_name">"Página principal"</string>
+    <string name="uid_name">"Aplicaciones básicas de Android"</string>
     <string name="folder_name">"Carpeta"</string>
     <string name="chooser_wallpaper">"Seleccionar fondo de pantalla de"</string>
     <string name="wallpaper_instructions">"Establecer fondo de pantalla"</string>
@@ -38,6 +39,9 @@
     <string name="add_photo_frame">"Picture frame"</string>
     <string name="add_search">"Búsqueda de Google"</string>
     <string name="out_of_space">"No queda espacio en esta pantalla de página principal."</string>
+    <string name="shortcut_installed">"El acceso directo \"%s\" está instalado."</string>
+    <string name="shortcut_uninstalled">"Se ha eliminado el acceso directo \"%s\"."</string>
+    <string name="shortcut_duplicate">"El acceso directo \"%s\" ya existe."</string>
     <string name="title_select_shortcut">"Seleccionar acceso directo"</string>
     <string name="title_select_live_folder">"Seleccionar carpeta"</string>
     <string name="menu_add">"Añadir"</string>

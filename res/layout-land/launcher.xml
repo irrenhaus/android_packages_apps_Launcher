@@ -34,12 +34,13 @@
         <include android:id="@+id/cell2" layout="@layout/workspace_screen" />
         <include android:id="@+id/cell3" layout="@layout/workspace_screen" />
         <include android:id="@+id/cell4" layout="@layout/workspace_screen" />
-	<include android:id="@+id/cell5" layout="@layout/workspace_screen" />
-	<include android:id="@+id/cell6" layout="@layout/workspace_screen" />
-	<include android:id="@+id/cell7" layout="@layout/workspace_screen" />
-	<include android:id="@+id/cell8" layout="@layout/workspace_screen" />
-	<include android:id="@+id/cell9" layout="@layout/workspace_screen" />
-	<include android:id="@+id/cell10" layout="@layout/workspace_screen" />
+        <include android:id="@+id/cell5" layout="@layout/workspace_screen" />
+        <include android:id="@+id/cell5" layout="@layout/workspace_screen" />
+        <include android:id="@+id/cell6" layout="@layout/workspace_screen" />
+        <include android:id="@+id/cell7" layout="@layout/workspace_screen" />
+        <include android:id="@+id/cell8" layout="@layout/workspace_screen" />
+        <include android:id="@+id/cell9" layout="@layout/workspace_screen" />
+        <include android:id="@+id/cell10" layout="@layout/workspace_screen" />
 
     </com.android.launcher.Workspace>
 

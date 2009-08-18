@@ -543,8 +543,8 @@ public class CellLayout extends ViewGroup {
      * Find a vacant area that will fit the given bounds nearest the requested
      * cell location. Uses Euclidean distance to score multiple vacant areas.
      * 
-     * @param cellX The X location of the desired location.
-     * @param cellY The Y location of the desired location.
+     * @param pixelX The X location at which you want to search for a vacant area.
+     * @param pixelY The Y location at which you want to search for a vacant area.
      * @param spanX Horizontal span of the object.
      * @param spanY Vertical span of the object.
      * @param vacantCells Pre-computed set of vacant cells to search.
@@ -939,7 +939,7 @@ out:            for (int i = x; i < x + spanX - 1 && x < xCount; i++) {
         int maxVacantSpanYSpanX;
         final Rect current = new Rect();
 
-        private void clearVacantCells() {
+        void clearVacantCells() {
             final ArrayList<VacantCell> list = vacantCells;
             final int count = list.size();
 
@@ -980,6 +980,10 @@ out:            for (int i = x; i < x + spanX - 1 && x < xCount; i++) {
          * @return True if a vacant cell of the specified dimension was found, false otherwise.
          */
         boolean findCellForSpan(int[] cellXY, int spanX, int spanY) {
+            return findCellForSpan(cellXY, spanX, spanY, true);
+        }
+
+        boolean findCellForSpan(int[] cellXY, int spanX, int spanY, boolean clear) {
             final ArrayList<VacantCell> list = vacantCells;
             final int count = list.size();
 
@@ -1013,7 +1017,7 @@ out:            for (int i = x; i < x + spanX - 1 && x < xCount; i++) {
                 }
             }
 
-            clearVacantCells();
+            if (clear) clearVacantCells();
 
             return found;
         }

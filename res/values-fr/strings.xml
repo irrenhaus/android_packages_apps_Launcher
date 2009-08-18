@@ -16,6 +16,7 @@
 <resources xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <string name="application_name">"Accueil"</string>
+    <string name="uid_name">"Applications de base Android"</string>
     <string name="folder_name">"Dossier"</string>
     <string name="chooser_wallpaper">"Sélectionner à partir de..."</string>
     <string name="wallpaper_instructions">"Sélectionner"</string>
@@ -38,6 +39,9 @@
     <string name="add_photo_frame">"Cadre d\'image"</string>
     <string name="add_search">"Recherche"</string>
     <string name="out_of_space">"Plus d\'espace libre sur l\'écran d\'accueil."</string>
+    <string name="shortcut_installed">"Le raccourci \"%s\" est installé."</string>
+    <string name="shortcut_uninstalled">"Le raccourci \"%s\" a été supprimé."</string>
+    <string name="shortcut_duplicate">"Le raccourci \"%s\" existe déjà."</string>
     <string name="title_select_shortcut">"Sélectionner un raccourci"</string>
     <string name="title_select_live_folder">"Sélectionner le dossier"</string>
     <string name="menu_add">"Ajouter"</string>

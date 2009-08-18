@@ -16,6 +16,7 @@
 <resources xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <string name="application_name">"Plocha"</string>
+    <string name="uid_name">"Android Core Apps"</string>
     <string name="folder_name">"Složka"</string>
     <string name="chooser_wallpaper">"Vybrat tapetu ze složky"</string>
     <string name="wallpaper_instructions">"Nastavit tapetu"</string>
@@ -38,6 +39,9 @@
     <string name="add_photo_frame">"Rámeček fotografie"</string>
     <string name="add_search">"Vyhledávání"</string>
     <string name="out_of_space">"Na této ploše již není místo."</string>
+    <string name="shortcut_installed">"Zástupce %s je nainstalován."</string>
+    <string name="shortcut_uninstalled">"Zástupce %s byl odebrán."</string>
+    <string name="shortcut_duplicate">"Zástupce %s již existuje."</string>
     <string name="title_select_shortcut">"Vyberte zástupce"</string>
     <string name="title_select_live_folder">"Vybrat složku"</string>
     <string name="menu_add">"Přidat"</string>
