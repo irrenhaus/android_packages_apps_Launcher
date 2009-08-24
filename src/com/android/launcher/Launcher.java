@@ -133,8 +133,8 @@ public final class Launcher extends Activity implements View.OnClickListener, On
     static final String EXTRA_CUSTOM_WIDGET = "custom_widget";
     static final String SEARCH_WIDGET = "search_widget";
 
-    static final int SCREEN_COUNT = 5;
-    static final int DEFAULT_SCREN = 2;
+    static int SCREEN_COUNT = 5;
+    static int DEFAULT_SCREN = 2;
     static final int NUMBER_CELLS_X = 4;
     static final int NUMBER_CELLS_Y = 4;
 

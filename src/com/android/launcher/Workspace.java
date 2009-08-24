@@ -1061,29 +1061,6 @@ public class Workspace extends ViewGroup implements DropTarget, DragSource, Drag
         final CellLayout.CellInfo cellInfo = mDragInfo;
         final int spanX = cellInfo == null ? 1 : cellInfo.spanX;
         final int spanY = cellInfo == null ? 1 : cellInfo.spanY;
-        final CellLayout layout = getCurrentDropLayout();
-        final CellLayout.CellInfo cellInfo = mDragInfo;
-        final int spanX = cellInfo == null ? 1 : cellInfo.spanX;
-        final int spanY = cellInfo == null ? 1 : cellInfo.spanY;
-
-        if (mVacantCache == null) {
-            final View ignoreView = cellInfo == null ? null : cellInfo.cell;
-            mVacantCache = layout.findAllVacantCells(null, ignoreView);
-        }
-
-        return mVacantCache.findCellForSpan(mTempEstimate, spanX, spanY, false);
-    }
-    
-    /*/**
-     * {@inheritDoc}
-     *
-    public Rect estimateDropLocation(DragSource source, int x, int y,
-            int xOffset, int yOffset, Object dragInfo, Rect recycle) {
-        final CellLayout layout = getCurrentDropLayout();
-        
-        final CellLayout.CellInfo cellInfo = mDragInfo;
-        final int spanX = cellInfo == null ? 1 : cellInfo.spanX;
-        final int spanY = cellInfo == null ? 1 : cellInfo.spanY;
         final View ignoreView = cellInfo == null ? null : cellInfo.cell;
         
         final Rect location = recycle != null ? recycle : new Rect();
@@ -1105,7 +1082,7 @@ public class Workspace extends ViewGroup implements DropTarget, DragSource, Drag
         location.bottom = mTempEstimate[1];
         
         return location;
-    }*/
+    }
 
     /**
      * Calculate the nearest cell where the given object would be dropped.
