@@ -584,7 +584,6 @@ public class LauncherModel {
             mRunning = true;
 
             long startTime = System.currentTimeMillis();
-            
             // Elevate priority when Home launches for the first time to avoid
             // starving at boot time. Staring at a blank home is not cool.
             android.os.Process.setThreadPriority(mIsLaunching ? Process.THREAD_PRIORITY_DEFAULT :

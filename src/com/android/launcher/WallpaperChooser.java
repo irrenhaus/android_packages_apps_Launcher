@@ -47,6 +47,8 @@ public class WallpaperChooser extends Activity implements AdapterView.OnItemSele
 	    R.drawable.wallpaper_cyan_small,
 	    R.drawable.wallpaper_glass_small,
 	    R.drawable.wallpaper_hazey_small,
+	    R.drawable.wallpaper_frog_small,
+	    R.drawable.wallpaper_turtle_small,
 	    R.drawable.wallpaper_brick_small
     };
 
@@ -55,6 +57,8 @@ public class WallpaperChooser extends Activity implements AdapterView.OnItemSele
 	    R.drawable.wallpaper_cyan,
 	    R.drawable.wallpaper_glass,
 	    R.drawable.wallpaper_hazey,
+	    R.drawable.wallpaper_frog,
+	    R.drawable.wallpaper_turtle,
 	    R.drawable.wallpaper_brick
     };
 
