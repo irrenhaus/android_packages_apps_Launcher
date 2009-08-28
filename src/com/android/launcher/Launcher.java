@@ -23,6 +23,8 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
+import com.android.launcher.SubMenuSettings.SubMenuDBHelper;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Application;
@@ -49,6 +51,7 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.database.ContentObserver;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
@@ -79,10 +82,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.MenuItem.OnMenuItemClickListener;
 import android.view.View.OnLongClickListener;
+import android.view.ViewGroup.LayoutParams;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.GridView;
+import android.widget.LinearLayout;
 import android.widget.SlidingDrawer;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -899,10 +905,72 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 
         //irrenhaus@xda Submenu settings
 
-        final Intent submenusettings = new Intent(Launcher.this, SubMenuSettings.class);
+        /*final Intent submenusettings = new Intent(Launcher.this, SubMenuSettings.class);
         menu.add(0, MENU_SUBMENU, 0, R.string.menu_submenu)
                 .setIcon(android.R.drawable.ic_menu_preferences).setAlphabeticShortcut('S')
-                .setIntent(submenusettings);
+                .setIntent(submenusettings);*/
+        menu.add(0, MENU_SUBMENU, 0, "Add Submenu").setIcon(android.R.drawable.ic_menu_preferences)
+        		.setAlphabeticShortcut('S').setOnMenuItemClickListener(new OnMenuItemClickListener() {
+					public boolean onMenuItemClick(MenuItem item) {
+						if(item.getItemId() == MENU_SUBMENU)
+						{
+							AlertDialog.Builder builder = new AlertDialog.Builder(Launcher.this);
+							
+							LinearLayout layout = new LinearLayout(Launcher.this);
+							layout.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
+							
+							final EditText edit = new EditText(Launcher.this);
+							
+							edit.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
+							
+							layout.addView(edit);
+							
+							builder.setTitle("Rename SubMenu");
+							builder.setView(layout);
+							
+							builder.setPositiveButton("Rename", new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog, int which) {
+									SubMenuDBHelper hlp = new SubMenuDBHelper(Launcher.this, false);
+									SQLiteDatabase db = hlp.getWritableDatabase();
+									SubMenuSettings.AddMenu(db, edit.getText().toString());
+									hlp.close();
+									
+									ApplicationInfo info = new ApplicationInfo();
+				                	info.container = ApplicationInfo.NO_ID;
+				                	info.itemType = LauncherSettings.Favorites.ITEM_TYPE_SHORTCUT;
+				                	info.title = edit.getText().toString();
+				                	info.id = -1;
+				                	info.icon = Launcher.this.getResources().getDrawable(R.drawable.ic_launcher_folder);
+				                	
+				                	Intent launchIntent = new Intent(Intent.ACTION_MAIN);
+				                    launchIntent.setClass(Launcher.this, SubMenu.class);
+				                    launchIntent.putExtra("com.android.launcher.Extended.SubMenu", info.title);
+				                	
+				                	info.intent = launchIntent;
+				                	
+				                	info.isSubMenu = true;
+									
+									Launcher.getModel().addApplicationInfo(info);
+									
+									dialog.cancel();
+								}
+							});
+							
+							builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog, int which) {
+									dialog.cancel();
+								}
+							});
+							
+							builder.create().show();
+							
+							return true;
+						}
+						
+						return false;
+					}
+        });
+        
         
         return true;
     }

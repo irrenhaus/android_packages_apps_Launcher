@@ -132,10 +132,11 @@ public class DeleteZone extends ImageView implements DropTarget, DragController.
     				builder.setTitle("Delete SubMenu");
     				builder.setMessage("Do you really wanna delete the submenu "+application.title+"?");
     				
-    				builder.setPositiveButton("Rename", new DialogInterface.OnClickListener() {
+    				builder.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
     					public void onClick(DialogInterface dialog, int which) {
     						SubMenuDBHelper hlp = new SubMenuDBHelper(DeleteZone.this.getContext(), false);
     						SQLiteDatabase db = hlp.getWritableDatabase();
+    						Launcher.getModel().removeApplicationInfo(application);
     						SubMenuSettings.DeleteMenu(db, ""+application.title);
     						hlp.close();
     						dialog.cancel();

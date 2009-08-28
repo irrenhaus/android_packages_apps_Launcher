@@ -10,6 +10,7 @@ import android.graphics.Rect;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup.LayoutParams;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
@@ -64,9 +65,13 @@ public class SubMenu extends LinearLayout implements OnItemClickListener, OnItem
 				
 				LinearLayout layout = new LinearLayout(SubMenu.this.context);
 				
+				layout.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
+				
 				final EditText edit = new EditText(SubMenu.this.context);
 				
 				edit.setText(SubMenu.this.title);
+				
+				edit.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
 				
 				layout.addView(edit);
 				
@@ -79,7 +84,7 @@ public class SubMenu extends LinearLayout implements OnItemClickListener, OnItem
 						SQLiteDatabase db = hlp.getWritableDatabase();
 						SubMenuSettings.RenameMenu(db, SubMenu.this.title, edit.getText().toString());
 						hlp.close();
-						Launcher.getModel().loadApplications(false, SubMenuSettings.activeLauncher, false);
+						//Launcher.getModel().loadApplications(false, SubMenuSettings.activeLauncher, false);
 						for(int i = 0; i < Launcher.getModel().getApplicationsAdapter().getCount(); i++)
 						{
 							ApplicationInfo info = Launcher.getModel().getApplicationsAdapter().getItem(i);
@@ -89,6 +94,7 @@ public class SubMenu extends LinearLayout implements OnItemClickListener, OnItem
 								Launcher.getModel().removeApplicationInfo(info);
 								info.title = edit.getText().toString();
 								Launcher.getModel().addApplicationInfo(info);
+								break;
 							}
 						}
 						
@@ -101,8 +107,10 @@ public class SubMenu extends LinearLayout implements OnItemClickListener, OnItem
 								
 								if(appInfo.isSubMenu && appInfo.title.equals(SubMenu.this.title))
 								{
+									Launcher.getModel().removeDesktopItem(info);
 									appInfo.title = edit.getText().toString();
-									//Launcher.getModel().removeDesktopItem(info);
+									Launcher.getModel().addDesktopItem(appInfo);
+									break;
 								}
 							}
 						}
