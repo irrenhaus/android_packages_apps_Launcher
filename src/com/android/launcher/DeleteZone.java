@@ -147,6 +147,8 @@ public class DeleteZone extends ImageView implements DropTarget, DragController.
     						dialog.cancel();
     					}
     				});
+    				
+    				builder.create().show();
         		}
         		else
         		{

@@ -16,7 +16,17 @@
 
 package com.android.launcher;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Collections;
+
 import android.app.Activity;
+import android.content.res.Resources;
+import android.content.res.XmlResourceParser;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -29,15 +39,6 @@ import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.Gallery;
 import android.widget.ImageView;
-import android.graphics.BitmapFactory;
-import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
-import android.content.res.Resources;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Collections;
 
 public class WallpaperChooser extends Activity implements AdapterView.OnItemSelectedListener,
         OnClickListener {
@@ -102,7 +103,7 @@ public class WallpaperChooser extends Activity implements AdapterView.OnItemSele
         final Resources resources = getResources();
         final String[] extras = resources.getStringArray(R.array.extra_wallpapers);
         final String packageName = getApplication().getPackageName();
-
+        
         for (String extra : extras) {
             int res = resources.getIdentifier(extra, "drawable", packageName);
             if (res != 0) {

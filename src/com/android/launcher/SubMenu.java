@@ -88,6 +88,8 @@ public class SubMenu extends LinearLayout implements OnItemClickListener, OnItem
 					}
 				});
 				
+				builder.create().show();
+				
 				return true;
 			}
         });
