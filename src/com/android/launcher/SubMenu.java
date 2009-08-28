@@ -1,5 +1,7 @@
 package com.android.launcher;
 
+import java.util.ArrayList;
+
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -77,6 +79,33 @@ public class SubMenu extends LinearLayout implements OnItemClickListener, OnItem
 						SQLiteDatabase db = hlp.getWritableDatabase();
 						SubMenuSettings.RenameMenu(db, SubMenu.this.title, edit.getText().toString());
 						hlp.close();
+						Launcher.getModel().loadApplications(false, SubMenuSettings.activeLauncher, false);
+						for(int i = 0; i < Launcher.getModel().getApplicationsAdapter().getCount(); i++)
+						{
+							ApplicationInfo info = Launcher.getModel().getApplicationsAdapter().getItem(i);
+							
+							if(info.title.equals(SubMenu.this.title))
+							{
+								Launcher.getModel().removeApplicationInfo(info);
+								info.title = edit.getText().toString();
+								Launcher.getModel().addApplicationInfo(info);
+							}
+						}
+						
+						ArrayList<ItemInfo> infos = Launcher.getModel().getDesktopItems();
+						for(ItemInfo info: infos)
+						{
+							if(info instanceof ApplicationInfo)
+							{
+								ApplicationInfo appInfo = (ApplicationInfo)info;
+								
+								if(appInfo.isSubMenu && appInfo.title.equals(SubMenu.this.title))
+								{
+									appInfo.title = edit.getText().toString();
+									//Launcher.getModel().removeDesktopItem(info);
+								}
+							}
+						}
 						Launcher.getModel().openSubMenu(edit.getText().toString());
 						dialog.cancel();
 					}
