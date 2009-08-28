@@ -165,6 +165,7 @@ public class SubMenuSettings extends ListActivity {
 				Log.d("SubMenuSettings", "DB check successfull");
 				
 				data.close();
+				db.close();
 	        }
 			
 			Log.d("SubMenuDBHelper", "Created");
@@ -501,10 +502,7 @@ public class SubMenuSettings extends ListActivity {
 	
 	void AddMenu(String title)
 	{
-		ContentValues values = new ContentValues();
-		values.put("name", title);
-		
-		mDatabase.insert("submenus", null, values);
+		AddMenu(mDatabase, title);
 		
 		refreshCursor();
 	}
@@ -552,4 +550,34 @@ public class SubMenuSettings extends ListActivity {
                 Utilities.createIconThumbnail(info.activityInfo.loadIcon(manager), context);
         application.filtered = false;
     }
+	
+	public static void AddMenu(SQLiteDatabase db, String title)
+	{
+		ContentValues values = new ContentValues();
+		values.put("name", title);
+		
+		db.insert("submenus", null, values);
+	}
+	
+	public static void RenameMenu(SQLiteDatabase db, String which, String title)
+	{
+		ContentValues content_values = new ContentValues();
+		content_values.put("submenu", title);
+		
+		ContentValues menu_values = new ContentValues();
+		menu_values.put("name", title);
+		
+		db.update("submenus_entries", content_values, "submenu = '"+which+"'", null);
+		
+		db.update("submenus", menu_values, "name = '"+which+"'", null);
+	}
+	
+	public static void DeleteMenu(SQLiteDatabase db, String title)
+	{
+		ContentValues values = new ContentValues();
+		values.put("submenu", "MainMenu");
+		
+		db.update("submenus_entries", values, "submenu = '"+title+"'", null);
+		db.delete("submenus", "name = '"+title+"'", null);
+	}
 }

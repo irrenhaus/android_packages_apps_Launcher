@@ -1456,9 +1456,18 @@ public final class Launcher extends Activity implements View.OnClickListener, On
     public void onClick(View v) {
         Object tag = v.getTag();
         if (tag instanceof ApplicationInfo) {
-            // Open shortcut
-            final Intent intent = ((ApplicationInfo) tag).intent;
-            startActivitySafely(intent);
+        	ApplicationInfo info = (ApplicationInfo) tag;
+        	
+        	if(info.isSubMenu)
+        	{
+        		Launcher.getModel().openSubMenu(""+info.title);
+        	}
+        	else
+        	{
+	            // Open shortcut
+	            final Intent intent = ((ApplicationInfo) tag).intent;
+	            startActivitySafely(intent);
+        	}
         } else if (tag instanceof FolderInfo) {
             handleFolderClick((FolderInfo) tag);
         }

@@ -84,9 +84,6 @@ public class SubMenuAdapter extends ArrayAdapter<ApplicationInfo> {
 	                apptitle = info.activityInfo.name;
 	            }
 	        	
-	        	if(!apptitle.equals(data.getString(data.getColumnIndex("name"))))
-	        		continue;
-	        	
 	        	ComponentName componentName = new ComponentName(
 	                    info.activityInfo.applicationInfo.packageName,
 	                    info.activityInfo.name);

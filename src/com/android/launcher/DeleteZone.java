@@ -16,8 +16,10 @@
 
 package com.android.launcher;
 
+import android.app.AlertDialog;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.res.TypedArray;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -31,7 +33,9 @@ import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.AnimationSet;
 import android.view.animation.TranslateAnimation;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.android.launcher.ExtendedDrawerSettings.ExtendedDrawerDBHelper;
@@ -123,7 +127,26 @@ public class DeleteZone extends ImageView implements DropTarget, DragController.
         		
         		if(application.isSubMenu)
         		{
-        			Toast.makeText(this.getContext(), "Sorry, no dropping of sub menus!", Toast.LENGTH_SHORT).show();
+        			AlertDialog.Builder builder = new AlertDialog.Builder(this.getContext());
+    				
+    				builder.setTitle("Delete SubMenu");
+    				builder.setMessage("Do you really wanna delete the submenu "+application.title+"?");
+    				
+    				builder.setPositiveButton("Rename", new DialogInterface.OnClickListener() {
+    					public void onClick(DialogInterface dialog, int which) {
+    						SubMenuDBHelper hlp = new SubMenuDBHelper(DeleteZone.this.getContext(), false);
+    						SQLiteDatabase db = hlp.getWritableDatabase();
+    						SubMenuSettings.DeleteMenu(db, ""+application.title);
+    						hlp.close();
+    						dialog.cancel();
+    					}
+    				});
+    				
+    				builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+    					public void onClick(DialogInterface dialog, int which) {
+    						dialog.cancel();
+    					}
+    				});
         		}
         		else
         		{

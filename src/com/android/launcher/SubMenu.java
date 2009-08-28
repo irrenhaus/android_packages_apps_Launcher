@@ -1,6 +1,8 @@
 package com.android.launcher;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Rect;
 import android.util.Log;
@@ -8,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
@@ -52,6 +55,41 @@ public class SubMenu extends LinearLayout implements OnItemClickListener, OnItem
 				Launcher.getModel().closeSubMenu(SubMenu.this);
 			}
         	
+        });
+        closeButton.setOnLongClickListener(new OnLongClickListener() {
+			public boolean onLongClick(View v) {
+				AlertDialog.Builder builder = new AlertDialog.Builder(SubMenu.this.context);
+				
+				LinearLayout layout = new LinearLayout(SubMenu.this.context);
+				
+				final EditText edit = new EditText(SubMenu.this.context);
+				
+				edit.setText(SubMenu.this.title);
+				
+				layout.addView(edit);
+				
+				builder.setTitle("Rename SubMenu");
+				builder.setView(layout);
+				
+				builder.setPositiveButton("Rename", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int which) {
+						SubMenuDBHelper hlp = new SubMenuDBHelper(SubMenu.this.context, false);
+						SQLiteDatabase db = hlp.getWritableDatabase();
+						SubMenuSettings.RenameMenu(db, SubMenu.this.title, edit.getText().toString());
+						hlp.close();
+						Launcher.getModel().openSubMenu(edit.getText().toString());
+						dialog.cancel();
+					}
+				});
+				
+				builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int which) {
+						dialog.cancel();
+					}
+				});
+				
+				return true;
+			}
         });
         
         adapter.generateAppsList(title);
