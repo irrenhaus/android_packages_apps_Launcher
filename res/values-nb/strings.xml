@@ -15,7 +15,7 @@
 -->
 <resources xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
-    <string name="application_name">"Hjem"</string>
+    <string name="application_name">"AdvancedLauncher"</string>
     <string name="folder_name">"Mappe"</string>
     <string name="chooser_wallpaper">"Velg bakgrunnsbilde fra"</string>
     <string name="wallpaper_instructions">"Velg bakgrunnsbilde"</string>

@@ -15,7 +15,7 @@
 -->
 <resources xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
-    <string name="application_name">"Главный экран"</string>
+    <string name="application_name">"AdvancedLauncher"</string>
     <string name="folder_name">"Папка"</string>
     <string name="chooser_wallpaper">"Выбор фонового рисунка из"</string>
     <string name="wallpaper_instructions">"Установить фоновый рисунок"</string>

@@ -14,16 +14,16 @@
      limitations under the License.
 -->
 
-<com.android.launcher.DragLayer
+<com.irrenhaus.advancedlauncher.DragLayer
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:launcher="http://schemas.android.com/apk/res/com.android.launcher"
+    xmlns:launcher="http://schemas.android.com/apk/res/com.irrenhaus.advancedlauncher"
 
     android:id="@+id/drag_layer"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent">
 
     <!-- The workspace contains 5 screens of cells -->
-    <com.android.launcher.Workspace
+    <com.irrenhaus.advancedlauncher.Workspace
         android:id="@+id/workspace"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
@@ -41,7 +41,7 @@
         <include android:id="@+id/cell9" layout="@layout/workspace_screen" />
         <include android:id="@+id/cell10" layout="@layout/workspace_screen" />
 
-    </com.android.launcher.Workspace>
+    </com.irrenhaus.advancedlauncher.Workspace>
 
     <SlidingDrawer
         android:id="@+id/drawer"
@@ -53,7 +53,7 @@
         android:handle="@+id/all_apps"
         android:content="@+id/content">
 
-        <com.android.launcher.HandleView
+        <com.irrenhaus.advancedlauncher.HandleView
             android:id="@id/all_apps"
             android:layout_width="fill_parent"
             android:layout_height="56dip"
@@ -68,7 +68,7 @@
 
             launcher:direction="horizontal" />
 
-        <com.android.launcher.AllAppsGridView
+        <com.irrenhaus.advancedlauncher.AllAppsGridView
             android:id="@id/content"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
@@ -89,7 +89,7 @@
 
     </SlidingDrawer>
 
-    <com.android.launcher.DeleteZone
+    <com.irrenhaus.advancedlauncher.DeleteZone
         android:id="@+id/delete_zone"
         android:layout_width="wrap_content"
         android:layout_height="49dip"
@@ -103,4 +103,4 @@
         
         launcher:direction="horizontal" />
 
-</com.android.launcher.DragLayer>
+</com.irrenhaus.advancedlauncher.DragLayer>

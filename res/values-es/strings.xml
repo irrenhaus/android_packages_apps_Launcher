@@ -15,7 +15,7 @@
 -->
 <resources xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
-    <string name="application_name">"Página principal"</string>
+    <string name="application_name">"AdvancedLauncher"</string>
     <string name="folder_name">"Carpeta"</string>
     <string name="chooser_wallpaper">"Seleccionar fondo de pantalla de"</string>
     <string name="wallpaper_instructions">"Establecer fondo de pantalla"</string>
