@@ -425,26 +425,6 @@ public class SubMenuSettings extends ListActivity {
 	
 	public static void MoveApplication(SQLiteDatabase db, String menu, String name, String intent, boolean insert)
 	{
-		
-		Cursor fix = db.query(false, "submenus_entries", new String[] { "_id", "name", "intent", "submenu" }, "name = "+DatabaseUtils.sqlEscapeString(name), null, null, null, null, null);
-			
-		try
-		{
-			fix.moveToFirst();
-			int field = fix.getColumnIndex("intent");
-			if(fix.getString(field) == null || fix.getString(field).equals("null") || fix.getString(field).equals(""))
-			{
-				menu = fix.getString(3);
-				insert = false;
-			}
-		} catch (Exception e)
-		{
-			Log.d("SubMenuSettings", "Error at "+name);
-			insert = true;
-		}
-		
-		fix.close();
-		
 		if(insert)
 		{
 			Cursor tmp = db.query(false, "submenus_entries", new String[] { "_id", "name", "intent" }, "intent = '"+intent+"'", null, null, null, null, null);
@@ -454,6 +434,15 @@ public class SubMenuSettings extends ListActivity {
 				tmp.close();
 				return;
 			}
+			
+			tmp.close();
+		}
+		else
+		{
+			Cursor tmp = db.query(false, "submenus_entries", new String[] { "_id", "name", "intent" }, "intent = '"+intent+"'", null, null, null, null, null);
+	        
+			if(tmp.getCount() <= 0)
+				insert = true;
 			
 			tmp.close();
 		}

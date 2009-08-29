@@ -1,6 +1,8 @@
 package com.irrenhaus.advancedlauncher;
 
 import java.net.URISyntaxException;
+import java.text.Collator;
+import java.util.Comparator;
 import java.util.List;
 
 import android.content.ComponentName;
@@ -23,6 +25,17 @@ import com.irrenhaus.advancedlauncher.SubMenuSettings.SubMenuDBHelper;
 public class SubMenuAdapter extends ArrayAdapter<ApplicationInfo> {
 	private final LayoutInflater mInflater;
 	private final Context context;
+	
+	private static class ApplicationInfoComparator implements Comparator<ApplicationInfo> {
+        public final int compare(ApplicationInfo a, ApplicationInfo b) {
+        	if(a.isSubMenu && ! b.isSubMenu)
+        		return -1;
+        	if(!a.isSubMenu && b.isSubMenu)
+        		return 1;
+        	
+            return Collator.getInstance().compare(a.title.toString(), b.title.toString());
+        }
+    }
 	
 	public SubMenuAdapter(Context context, int textViewResourceId) {
 		super(context, textViewResourceId);
@@ -55,12 +68,13 @@ public class SubMenuAdapter extends ArrayAdapter<ApplicationInfo> {
 		SubMenuDBHelper hlp = new SubMenuDBHelper(context, false);
 		SQLiteDatabase db = hlp.getReadableDatabase();
 		
-		Cursor data = db.query("submenus_entries", new String[] {"_id", "name", "intent", "submenu"}, "submenu = '"+title+"'", null, "Upper(name)", null, null);
+		Cursor data = db.query("submenus_entries", new String[] {"_id", "name", "intent", "submenu"}, "submenu = '"+title+"'", null, null, null, null);
 
 		PackageManager manager = context.getPackageManager();
 		
 		while(data.moveToNext())
 		{
+			Log.d("SubMenuAdapter", "Got: "+data.getString(2));
 			Intent intent;
 			try {
 				intent = Intent.getIntent(data.getString(2));
@@ -99,6 +113,8 @@ public class SubMenuAdapter extends ArrayAdapter<ApplicationInfo> {
 	        	
 	            this.add(application);
 		}
+		
+		this.sort(new ApplicationInfoComparator());
 		
 		data.close();
 		db.close();
