@@ -20,12 +20,16 @@ import android.app.AlertDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.content.res.TypedArray;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.TransitionDrawable;
+import android.net.Uri;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.animation.AccelerateInterpolator;
@@ -33,9 +37,7 @@ import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.AnimationSet;
 import android.view.animation.TranslateAnimation;
-import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.android.launcher.R;
@@ -96,27 +98,74 @@ public class DeleteZone extends ImageView implements DropTarget, DragController.
     }
 
 	SQLiteDatabase mDatabase;
+	int questionChoice = -1;
     
     public void onDrop(DragSource source, int x, int y, int xOffset, int yOffset, Object dragInfo) {
         final ItemInfo item = (ItemInfo) dragInfo;
 
-		Toast toast;        
+		final Toast toast;        
 		
         //irrenhaus
         if(item instanceof ApplicationInfo && source instanceof SubMenu)
         {
-        	ApplicationInfo appInfo = (ApplicationInfo)item;
+        	final ApplicationInfo appInfo = (ApplicationInfo)item;
         	
-        	SubMenuDBHelper hlp = new SubMenuDBHelper(this.getContext(), false);
-        	SQLiteDatabase db = hlp.getWritableDatabase();
-        	SubMenuSettings.MoveApplication(db, "MainMenu", appInfo.title.toString(), appInfo.intent.toURI(), false);
-        	
-        	Toast.makeText(this.getContext(), "Application '"+appInfo.title+"' has been moved to MainMenu", Toast.LENGTH_SHORT).show();
-        
-        	db.close();
-        	
-        	//Launcher.getModel().loadApplications(false, SubMenuSettings.activeLauncher, false);
-        	AdvancedLauncher.getModel().addApplicationInfo(appInfo);
+        	AlertDialog.Builder builder = new AlertDialog.Builder(this.getContext());
+			
+			final int HIDE = 0;
+			final int UNINSTALL = 1;
+			
+			DialogInterface.OnClickListener choiceListener = new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					questionChoice = which;
+				}
+			};
+			
+			builder.setSingleChoiceItems(new String[] {"Move to main menu", "Uninstall "+appInfo.title}, -1,
+										choiceListener);
+			
+			builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					if(questionChoice == UNINSTALL)
+					{
+						String pkg = null;
+						
+						if(appInfo.iconResource != null)
+							pkg = appInfo.iconResource.packageName;
+						else
+						{
+							PackageManager mgr = DeleteZone.this.getContext().getPackageManager();
+							ResolveInfo res = mgr.resolveActivity(appInfo.intent, 0);
+							pkg = res.activityInfo.packageName;
+						}
+						//Uri packageURI = Uri.parse("package:com.android.myapp");
+						Intent uninstallIntent = new Intent(Intent.ACTION_DELETE, Uri.parse("package:"+pkg));
+						DeleteZone.this.getContext().startActivity(uninstallIntent);
+					}
+					else
+					{
+						SubMenuDBHelper hlp = new SubMenuDBHelper(DeleteZone.this.getContext(), false);
+			        	SQLiteDatabase db = hlp.getWritableDatabase();
+			        	SubMenuSettings.MoveApplication(db, "MainMenu", appInfo.title.toString(), appInfo.intent.toURI(), false);
+			        	
+			        	Toast.makeText(DeleteZone.this.getContext(), "Application '"+appInfo.title+"' has been moved to MainMenu", Toast.LENGTH_SHORT).show();
+			        
+			        	db.close();
+			        	
+			        	//Launcher.getModel().loadApplications(false, SubMenuSettings.activeLauncher, false);
+			        	AdvancedLauncher.getModel().addApplicationInfo(appInfo);
+					}
+					dialog.cancel();
+				}
+			});
+			
+			builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					dialog.cancel();
+				}
+			});
+			
+    		builder.create().show();
         }
 		
         /* Rogro82@xda Extended : Check for application drawer items on delete and if so add them to the database */
@@ -154,34 +203,78 @@ public class DeleteZone extends ImageView implements DropTarget, DragController.
         		}
         		else
         		{
-	        		ExtendedDrawerDBHelper hlp = new ExtendedDrawerDBHelper(this.getContext());                 
-	                mDatabase = hlp.getWritableDatabase(); 
-	
-	                Cursor eCursor = mDatabase.query(false, "extendeddrawer_hidden", new String[] { "_id", "name", "intent" }, "intent='" + application.intent.toURI() + "'", null, null, null, null, null);
-	
-	                //Only show if its not in the appdrawer table
-	                if(eCursor.getCount()==0)
-	                {
-	                
-	                ContentValues insertValues = new ContentValues();
-			        insertValues.put("name", (String) application.title);
-			        insertValues.put("intent", application.intent.toURI());
-			        mDatabase.insert("extendeddrawer_hidden", "", insertValues);
-			        
-	                }
-	
-	                eCursor.close();
-	                mDatabase.close();
-	                
-	                toast = Toast.makeText(this.getContext(), "Application '" + application.title + "' has been hidden from the application drawer.", Toast.LENGTH_SHORT);
-	            	toast.show();
-	            	
-	                final LauncherModel model = AdvancedLauncher.getModel();
-	
-	                //model.dropApplications();
-	                //model.loadApplications(false, mLauncher, false);
-					AdvancedLauncher.getModel().removeApplicationInfo(application);
-            	
+        			AlertDialog.Builder builder = new AlertDialog.Builder(this.getContext());
+        			
+        			final int HIDE = 0;
+        			final int UNINSTALL = 1;
+        			
+        			DialogInterface.OnClickListener choiceListener = new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int which) {
+							questionChoice = which;
+						}
+        			};
+        			
+        			builder.setSingleChoiceItems(new String[] {"Hide from launcher", "Uninstall "+application.title}, -1,
+        										choiceListener);
+        			
+        			builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int which) {
+							if(questionChoice == UNINSTALL)
+							{
+								String pkg = null;
+								
+								if(application.iconResource != null)
+									pkg = application.iconResource.packageName;
+								else
+								{
+									PackageManager mgr = DeleteZone.this.getContext().getPackageManager();
+									ResolveInfo res = mgr.resolveActivity(application.intent, 0);
+									pkg = res.activityInfo.packageName;
+								}
+								//Uri packageURI = Uri.parse("package:com.android.myapp");
+								Intent uninstallIntent = new Intent(Intent.ACTION_DELETE, Uri.parse("package:"+pkg));
+								DeleteZone.this.getContext().startActivity(uninstallIntent);
+							}
+							else
+							{
+								ExtendedDrawerDBHelper hlp = new ExtendedDrawerDBHelper(DeleteZone.this.getContext());                 
+				                mDatabase = hlp.getWritableDatabase(); 
+				
+				                Cursor eCursor = mDatabase.query(false, "extendeddrawer_hidden", new String[] { "_id", "name", "intent" }, "intent='" + application.intent.toURI() + "'", null, null, null, null, null);
+				
+				                //Only show if its not in the appdrawer table
+				                if(eCursor.getCount()==0)
+				                {
+				                
+				                ContentValues insertValues = new ContentValues();
+						        insertValues.put("name", (String) application.title);
+						        insertValues.put("intent", application.intent.toURI());
+						        mDatabase.insert("extendeddrawer_hidden", "", insertValues);
+						        
+				                }
+				
+				                eCursor.close();
+				                mDatabase.close();
+				                
+				                Toast.makeText(DeleteZone.this.getContext(), "Application '" + application.title + "' has been hidden from the application drawer.", Toast.LENGTH_SHORT).show();
+				            	
+				                final LauncherModel model = AdvancedLauncher.getModel();
+				
+				                //model.dropApplications();
+				                //model.loadApplications(false, mLauncher, false);
+								AdvancedLauncher.getModel().removeApplicationInfo(application);
+							}
+							dialog.cancel();
+						}
+        			});
+        			
+        			builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int which) {
+							dialog.cancel();
+						}
+        			});
+        			
+	        		builder.create().show();
         		}
         	}
         	

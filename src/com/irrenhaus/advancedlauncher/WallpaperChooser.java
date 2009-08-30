@@ -23,6 +23,7 @@ import java.util.Collections;
 
 import org.xmlpull.v1.XmlPullParserException;
 
+import com.android.internal.util.XmlUtils;
 import com.android.launcher.R;
 
 import android.app.Activity;
@@ -127,6 +128,16 @@ public class WallpaperChooser extends Activity implements AdapterView.OnItemSele
         {
         	final XmlResourceParser xml = resources.getXml(xmlRes);
         	
+        	try {
+				XmlUtils.beginDocument(xml, "wallpaper");
+			} catch (XmlPullParserException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+        	
         	boolean readNext = true;
         	
         	while(readNext)
@@ -149,13 +160,17 @@ public class WallpaperChooser extends Activity implements AdapterView.OnItemSele
 		            	Log.d("WallpaperChooser", "Couldn't find wallpaper named "+extra);
 				} catch (XmlPullParserException e) {
 					readNext = false;
+					Log.d("WallpaperChooser", e.getMessage());
 				} catch (IOException e) {
 					readNext = false;
+					Log.d("WallpaperChooser", e.getMessage());
 				}
         	}
         	
         	xml.close();
         }
+        else
+        	Log.d("WallpaperChooser", "Could not find XML resource extra_wallpapers!");
     }
 
     @Override

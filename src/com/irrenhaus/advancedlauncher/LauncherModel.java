@@ -1012,16 +1012,27 @@ public class LauncherModel {
                                 info.cellX = c.getInt(cellXIndex);
                                 info.cellY = c.getInt(cellYIndex);
 
-                                switch (container) {
-                                case LauncherSettings.Favorites.CONTAINER_DESKTOP:
-                                    desktopItems.add(info);
-                                    break;
-                                default:
-                                    // Item is in a user folder
-                                    UserFolderInfo folderInfo =
-                                            findOrMakeUserFolder(folders, container);
-                                    folderInfo.add(info);
-                                    break;
+                                if(info.intent.toURI().contains("com.irrenhaus.advancedlauncher.Extended.SubMenu"))
+                            	{
+            	                	info.container = LauncherSettings.Favorites.CONTAINER_DESKTOP;
+            	                	info.itemType = LauncherSettings.Favorites.ITEM_TYPE_SHORTCUT;
+            	                	info.icon = mLauncher.get().getResources().getDrawable(R.drawable.ic_launcher_folder);
+            	                	info.isSubMenu = true;
+            	                	desktopItems.add(info);
+                            	}
+                                else
+                                {
+	                                switch (container) {
+	                                case LauncherSettings.Favorites.CONTAINER_DESKTOP:
+	                                	desktopItems.add(info);
+	                                    break;
+	                                default:
+	                                    // Item is in a user folder
+	                                    UserFolderInfo folderInfo =
+	                                            findOrMakeUserFolder(folders, container);
+	                                    folderInfo.add(info);
+	                                    break;
+	                                }
                                 }
                             }
                             break;

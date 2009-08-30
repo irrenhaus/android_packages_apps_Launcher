@@ -74,7 +74,6 @@ public class SubMenuAdapter extends ArrayAdapter<ApplicationInfo> {
 		
 		while(data.moveToNext())
 		{
-			Log.d("SubMenuAdapter", "Got: "+data.getString(2));
 			Intent intent;
 			try {
 				intent = Intent.getIntent(data.getString(2));

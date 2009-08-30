@@ -925,15 +925,16 @@ public class Workspace extends ViewGroup implements DropTarget, DragSource, Drag
     }
 
     public void onDrop(DragSource source, int x, int y, int xOffset, int yOffset, Object dragInfo) {
-    	/*if(dragInfo instanceof ApplicationInfo)
+    	if(dragInfo instanceof ApplicationInfo)
     	{
     		ApplicationInfo appInfo = (ApplicationInfo)dragInfo;
     		if(appInfo.isSubMenu)
     		{
-    			Toast.makeText(this.getContext(), "Sorry, no dropping of sub menus!", Toast.LENGTH_SHORT).show();
-    			return;
+    			//Toast.makeText(this.getContext(), "Sorry, no dropping of sub menus!", Toast.LENGTH_SHORT).show();
+    			//return;
+    			appInfo.container = LauncherSettings.Favorites.CONTAINER_DESKTOP;
     		}
-    	}*/
+    	}
     	
         final CellLayout cellLayout = getCurrentDropLayout();
         if (source != this) {
@@ -979,15 +980,16 @@ public class Workspace extends ViewGroup implements DropTarget, DragSource, Drag
     
     private void onDropExternal(int x, int y, Object dragInfo, CellLayout cellLayout,
             boolean insertAtFirst) {
-    	/*if(dragInfo instanceof ApplicationInfo)
+    	if(dragInfo instanceof ApplicationInfo)
     	{
     		ApplicationInfo appInfo = (ApplicationInfo)dragInfo;
     		if(appInfo.isSubMenu)
     		{
-    			Toast.makeText(this.getContext(), "Sorry, no dropping of sub menus!", Toast.LENGTH_SHORT).show();
-    			return;
+    			//Toast.makeText(this.getContext(), "Sorry, no dropping of sub menus!", Toast.LENGTH_SHORT).show();
+    			//return;
+    			appInfo.container = LauncherSettings.Favorites.CONTAINER_DESKTOP;
     		}
-    	}*/
+    	}
     	
         // Drag from somewhere else
         ItemInfo info = (ItemInfo) dragInfo;
