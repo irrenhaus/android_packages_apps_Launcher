@@ -116,6 +116,8 @@ public final class AdvancedLauncher extends Activity implements View.OnClickList
     private static final int MENU_SETTINGS = MENU_NOTIFICATIONS + 1;
     private static final int MENU_EXTENDED = MENU_SETTINGS + 1;
     private static final int MENU_SUBMENU = MENU_EXTENDED + 1;
+    private static final int MENU_CREATE_BACKUP = MENU_SUBMENU + 1;
+    private static final int MENU_RESTORE_BACKUP = MENU_CREATE_BACKUP + 1;
 
     private static final int REQUEST_CREATE_SHORTCUT = 1;
     private static final int REQUEST_CREATE_LIVE_FOLDER = 4;
@@ -972,6 +974,40 @@ public final class AdvancedLauncher extends Activity implements View.OnClickList
 					}
         });
         
+        menu.add(0, MENU_CREATE_BACKUP, 0, "Create config backup").setIcon(android.R.drawable.ic_menu_preferences)
+		.setAlphabeticShortcut('C').setOnMenuItemClickListener(new OnMenuItemClickListener() {
+			public boolean onMenuItemClick(MenuItem item) {
+				if(item.getItemId() == MENU_CREATE_BACKUP)
+				{
+					if(SubMenuSettings.createConfigBackup(AdvancedLauncher.this))
+						Toast.makeText(AdvancedLauncher.this, "Created backup in /sdcard/AdvancedLauncher/", Toast.LENGTH_SHORT).show();
+					else
+						Toast.makeText(AdvancedLauncher.this, "Backup creation failed!", Toast.LENGTH_SHORT).show();
+					
+					return true;
+				}
+				
+				return false;
+			}
+		});
+        
+        menu.add(0, MENU_RESTORE_BACKUP, 0, "Restore config backup").setIcon(android.R.drawable.ic_menu_preferences)
+		.setAlphabeticShortcut('R').setOnMenuItemClickListener(new OnMenuItemClickListener() {
+			public boolean onMenuItemClick(MenuItem item) {
+				if(item.getItemId() == MENU_RESTORE_BACKUP)
+				{
+					if(SubMenuSettings.restoreConfigBackup(AdvancedLauncher.this))
+						Toast.makeText(AdvancedLauncher.this, "Restored backup successfully", Toast.LENGTH_SHORT).show();
+					else
+						Toast.makeText(AdvancedLauncher.this, "Backup restore failed!", Toast.LENGTH_SHORT).show();
+					
+					return true;
+				}
+				
+				return false;
+			}
+		});
+        
         
         return true;
     }
@@ -1030,7 +1066,7 @@ public final class AdvancedLauncher extends Activity implements View.OnClickList
         if (packageName != null && packageName.length() > 0) {
             mWorkspace.updateShortcutsForPackage(packageName);
         }
-    }
+    } 
 
     void addAppWidget(Intent data) {
         // TODO: catch bad widget exception when sent

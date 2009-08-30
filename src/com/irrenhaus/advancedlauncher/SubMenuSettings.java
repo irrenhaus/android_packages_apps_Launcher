@@ -1,9 +1,17 @@
 package com.irrenhaus.advancedlauncher;
 
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.List;
-
-import com.android.launcher.R;
 
 import android.app.ListActivity;
 import android.app.ProgressDialog;
@@ -28,11 +36,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.View.OnCreateContextMenuListener;
-import android.view.ViewGroup.OnHierarchyChangeListener;
 import android.widget.CursorAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
+
+import com.android.launcher.R;
+import com.irrenhaus.advancedlauncher.ExtendedDrawerSettings.ExtendedDrawerDBHelper;
 
 public class SubMenuSettings extends ListActivity {
 	
@@ -529,6 +539,63 @@ public class SubMenuSettings extends ListActivity {
         }
 	}
 	
+	public static ArrayList<ApplicationInfo> getSubmenuContents(Context context, String submenu)
+	{
+		ArrayList<ApplicationInfo> ret = new ArrayList<ApplicationInfo>();
+		SubMenuDBHelper hlp = new SubMenuDBHelper(context, false);
+		SQLiteDatabase db = hlp.getReadableDatabase();
+		
+		Cursor data = db.query("submenus_entries", new String[] {"_id", "name", "intent", "submenu"}, "submenu = '"+submenu+"'", null, null, null, null);
+
+		PackageManager manager = context.getPackageManager();
+		
+		while(data.moveToNext())
+		{
+			Intent intent;
+			try {
+				intent = Intent.getIntent(data.getString(2));
+				if(intent.resolveActivity(manager) == null)
+				{
+					continue;
+				}
+			} catch (URISyntaxException e) {
+				Log.d("SubMenuAdapter", "Could not get intent from uri!");
+				continue;
+			}
+			
+	        final List<ResolveInfo> apps = manager.queryIntentActivities(intent, 0);
+			
+	        if(apps.size() <= 0)
+	        	continue;
+	        
+	        ResolveInfo info = apps.get(0);
+	        	
+	        	String apptitle = info.loadLabel(manager).toString();
+	        	if (apptitle == null) {
+	                apptitle = info.activityInfo.name;
+	            }
+	        	
+	        	ComponentName componentName = new ComponentName(
+	                    info.activityInfo.applicationInfo.packageName,
+	                    info.activityInfo.name);
+	        	
+	        	ApplicationInfo application = new ApplicationInfo();
+	            application.container = ItemInfo.NO_ID;
+
+	            updateApplicationInfoTitleAndIcon(manager, info, application, context);
+
+	            application.setActivity(componentName,
+	                    Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+	        	
+	            ret.add(application);
+		}
+		
+		data.close();
+		db.close();
+		
+		return ret;
+	}
+	
 	private static void updateApplicationInfoTitleAndIcon(PackageManager manager, ResolveInfo info,
             ApplicationInfo application, Context context) {
 
@@ -571,4 +638,281 @@ public class SubMenuSettings extends ListActivity {
 		db.update("submenus_entries", values, "submenu = '"+title+"'", null);
 		db.delete("submenus", "name = '"+title+"'", null);
 	}
+	
+	private static FileWriter openSDCardFileW(String fileName)
+	{
+		try {
+			File root = new File("sdcard/" + "AdvancedLauncher");
+		    
+			if(root.exists() || root.mkdir())
+		    {
+		        File file = new File(root, fileName);
+		        
+		        if(!file.exists())
+		        	file.createNewFile();
+		        
+		        FileWriter writer;
+				writer = new FileWriter(file);
+				
+		        return writer;
+		    }
+		} catch (IOException e) {
+			Log.d("BackupCreation", e.getMessage());
+			return null;
+		}
+	    
+	    return null;
+	}
+	
+	private static FileReader openSDCardFileR(String fileName)
+	{
+		try {
+			File root = new File("sdcard/" + "AdvancedLauncher");
+		    
+			if(root.exists() || root.mkdir())
+		    {
+		        File file = new File(root, fileName);
+		        
+		        if(!file.exists())
+		        	file.createNewFile();
+		        
+		        FileReader reader;
+				reader = new FileReader(file);
+				
+		        return reader;
+		    }
+		} catch (IOException e) {
+			Log.d("BackupCreation", e.getMessage());
+			return null;
+		}
+	    
+	    return null;
+	}
+	
+	public static boolean createConfigBackup(Context context)
+	{
+		String dbPath = "/data/data/com.irrenhaus.advancedlauncher/databases/";
+		String prefPath = "/data/data/com.irrenhaus.advancedlauncher/shared_prefs/";
+		String outPath = "/sdcard/AdvancedLauncher/";
+
+		String submenuFile = dbPath+"/submenu.sqlite";
+		String extendedFile = dbPath+"/extendeddrawer.sqlite";
+		String prefsFile = prefPath+"/extendedlauncher.xml";
+		
+		String submenuOutFile = "submenu.sql";
+		String extendedOutFile = "extendeddrawer.sql";
+		String prefsOutFile = "extendedlauncher.xml";
+		
+		CommandHandler bkupSubmenu = new CommandHandler(true, "sqlite3 "+submenuFile+" .dump");
+		CommandHandler bkupExtended = new CommandHandler(true, "sqlite3 "+extendedFile+" .dump");
+		CommandHandler bkupPrefs = new CommandHandler(true, "cp "+prefsFile+" "+outPath+prefsOutFile);
+
+		bkupSubmenu.start();
+		bkupExtended.start();
+		bkupPrefs.start();
+		try {
+			bkupSubmenu.join();
+			bkupExtended.join();
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
+			return false;
+		}
+		
+		try {
+			FileWriter fw = openSDCardFileW(submenuOutFile);
+
+			if(fw == null)
+				return false;
+			
+			ArrayList<String> lines = bkupSubmenu.getStdOutLines();
+			
+			if(lines.size() > 0)
+			{
+				for(String line: lines)
+				{
+					fw.write(line);
+					fw.write("\n");
+				}
+			}
+			
+			fw.flush();
+			fw.close();
+			
+			fw = openSDCardFileW(extendedOutFile);
+
+			if(fw == null)
+				return false;
+			
+			lines = bkupExtended.getStdOutLines();
+			
+			if(lines.size() > 0)
+			{
+				for(String line: lines)
+				{
+					fw.write(line);
+					fw.write("\n");
+				}
+			}
+			
+			fw.flush();
+			fw.close();
+		} catch (FileNotFoundException e) {
+			Log.d("BackupCreation", e.getMessage());
+			return false;
+		} catch (IOException e) {
+			Log.d("BackupCreation", e.getMessage());
+			return false;
+			
+		}
+		
+		return true;
+	}
+	
+	public static boolean restoreConfigBackup(Context context)
+	{
+		String dbPath = "/data/data/com.irrenhaus.advancedlauncher/databases/";
+		String prefPath = "/data/data/com.irrenhaus.advancedlauncher/shared_prefs/";
+		String outPath = "/sdcard/AdvancedLauncher/";
+
+		String submenuFile = dbPath+"/submenu.sqlite";
+		String extendedFile = dbPath+"/extendeddrawer.sqlite";
+		String prefsFile = prefPath+"/extendedlauncher.xml";
+		
+		String submenuOutFile = "submenu.sql";
+		String extendedOutFile = "extendeddrawer.sql";
+		String prefsOutFile = "extendedlauncher.xml";
+		
+		CommandHandler bkupPrefs = new CommandHandler(true, "cp "+outPath+prefsOutFile+" "+prefsFile);
+
+		bkupPrefs.start();
+
+		CommandHandler rmSubmenuDB = new CommandHandler(true, "rm "+submenuFile);
+		CommandHandler rmExtendedDB = new CommandHandler(true, "rm "+extendedFile);
+		
+		CommandHandler readSubmenuDB = new CommandHandler(true, "sqlite3 "+submenuFile+" \".read "+outPath+submenuOutFile+"\"");
+		CommandHandler readExtendedDB = new CommandHandler(true, "sqlite3 "+extendedFile+" \".read "+outPath+extendedOutFile+"\"");
+		
+		rmSubmenuDB.start();
+		rmExtendedDB.start();
+
+		try {
+			rmSubmenuDB.join();
+			rmExtendedDB.join();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+			return false;
+		}
+		
+		SubMenuDBHelper hlp = new SubMenuDBHelper(context, false);
+		hlp.getWritableDatabase();
+		hlp.close();
+		ExtendedDrawerDBHelper extendedHlp = new ExtendedDrawerDBHelper(context);
+		extendedHlp.getWritableDatabase();
+		extendedHlp.close();
+
+		readSubmenuDB.start();
+		readExtendedDB.start();
+		
+		return true;
+	}
+	
+	//From wifi teether for root users
+	
+	static class CommandHandler extends Thread {
+        
+        public static final String MSG_TAG = "SubMenu -> ExecuteProcess";
+        
+        private Process process = null;
+        private String command;
+        private Runtime runtime;
+        private ArrayList<String> stdOutLines;
+        private int exitCode = -1;
+        private boolean runAsRoot = false;
+
+        CommandHandler(String command) {
+                this.command = command;
+                this.runAsRoot = false;
+                this.runtime = Runtime.getRuntime();
+        }
+
+        CommandHandler(boolean runAsRoot, String command) {
+                this.command = command;
+                this.runAsRoot = runAsRoot;
+                this.runtime = Runtime.getRuntime();
+        }
+        
+        public int getExitCode() {
+                return this.exitCode;
+        }
+        
+        public ArrayList<String> getStdOutLines() {
+                return this.stdOutLines;
+        }
+        
+        public void destroy() {
+                try {
+                        if (this.process != null) {
+                                this.process.destroy();
+                        }
+                        this.interrupt();
+                }
+                catch (Exception ex) {
+                        // nothing
+                }
+        }
+        
+        public void run() {
+                DataOutputStream os = null;
+        InputStream stderr = null;
+        InputStream stdout = null;
+        String line;
+        
+        this.stdOutLines = new ArrayList<String>();
+        Log.d(MSG_TAG, "Executing command (root:"+this.runAsRoot+"): " + command);
+        try {
+                this.runtime.gc();
+                if (this.runAsRoot) {
+                        this.process = this.runtime.exec("su");
+                }
+                else {
+                        this.process = this.runtime.exec(command);
+                }
+                stderr = this.process.getErrorStream();
+                stdout = this.process.getInputStream();
+                BufferedReader errBr = new BufferedReader(new InputStreamReader(stderr), 8192);
+                BufferedReader inputBr = new BufferedReader(new InputStreamReader(stdout), 8192);
+                if (this.runAsRoot) {
+                        os = new DataOutputStream(process.getOutputStream());
+                        os.writeBytes(command+"\n");
+                        os.flush();
+                        os.writeBytes("exit\n");
+                        os.flush();
+                }
+                while ((line = inputBr.readLine()) != null) {
+                        stdOutLines.add(line.trim());
+                        Log.d(MSG_TAG, "STDOUT: "+line.trim());
+                }
+                while ((line = errBr.readLine()) != null);
+                this.exitCode = this.process.waitFor();
+        } catch (Exception e) {
+                Log.d(MSG_TAG, "Unexpected error - Here is what I know: "+e.getMessage());
+        }
+        finally {
+                // Closing streams
+                        try {
+                                if (os != null)
+                                        os.close();
+                                if (stderr != null)
+                                        stderr.close();
+                                if (stdout != null)
+                                        stdout.close();
+                        } catch (Exception ex) {;}
+                        // Destroy process
+                        try {
+                                this.process.destroy();
+                        } catch (Exception e) {;}
+        }
+        }
+	}
+
 }

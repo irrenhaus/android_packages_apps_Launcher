@@ -84,7 +84,7 @@ public class LauncherModel {
     private Thread mApplicationsLoaderThread;
     private Thread mDesktopLoaderThread;
     
-    private SubMenu currentOpenSubMenu = null;
+    public SubMenu currentOpenSubMenu = null;
 
     private final HashMap<ComponentName, ApplicationInfo> mAppInfoCache =
             new HashMap<ComponentName, ApplicationInfo>(INITIAL_ICON_CACHE_CAPACITY);
@@ -553,6 +553,8 @@ public class LauncherModel {
             parent.removeView(menu);
         }
         menu.onClose();
+        
+        currentOpenSubMenu = null;
     }
 
     private class ApplicationsLoader implements Runnable {

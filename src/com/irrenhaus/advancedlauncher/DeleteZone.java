@@ -16,6 +16,8 @@
 
 package com.irrenhaus.advancedlauncher;
 
+import java.util.ArrayList;
+
 import android.app.AlertDialog;
 import android.content.ContentValues;
 import android.content.Context;
@@ -187,6 +189,15 @@ public class DeleteZone extends ImageView implements DropTarget, DragController.
     						SubMenuDBHelper hlp = new SubMenuDBHelper(DeleteZone.this.getContext(), false);
     						SQLiteDatabase db = hlp.getWritableDatabase();
     						AdvancedLauncher.getModel().removeApplicationInfo(application);
+    						
+    						ArrayList<ApplicationInfo> list = SubMenuSettings.getSubmenuContents(DeleteZone.this.getContext(),
+    																							application.title.toString());
+    						
+    						for(ApplicationInfo app: list)
+    						{
+    							AdvancedLauncher.getModel().addApplicationInfo(app);
+    						}
+    						
     						SubMenuSettings.DeleteMenu(db, ""+application.title);
     						hlp.close();
     						dialog.cancel();

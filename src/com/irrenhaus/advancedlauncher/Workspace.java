@@ -980,6 +980,9 @@ public class Workspace extends ViewGroup implements DropTarget, DragSource, Drag
     
     private void onDropExternal(int x, int y, Object dragInfo, CellLayout cellLayout,
             boolean insertAtFirst) {
+    	if(AdvancedLauncher.getModel().currentOpenSubMenu != null)
+    		return;
+    	
     	if(dragInfo instanceof ApplicationInfo)
     	{
     		ApplicationInfo appInfo = (ApplicationInfo)dragInfo;
