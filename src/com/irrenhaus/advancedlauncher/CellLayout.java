@@ -29,7 +29,7 @@ import android.view.ViewGroup;
 
 import java.util.ArrayList;
 
-import com.android.launcher.R;
+import com.irrenhaus.advancedlauncher.R;
 
 public class CellLayout extends ViewGroup {
     private boolean mPortrait;

@@ -16,19 +16,15 @@
 
 package com.irrenhaus.advancedlauncher;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 
-import org.xmlpull.v1.XmlPullParserException;
-
-import com.android.internal.util.XmlUtils;
-import com.android.launcher.R;
-
 import android.app.Activity;
+import android.content.res.AssetManager;
 import android.content.res.Resources;
-import android.content.res.XmlResourceParser;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
@@ -44,6 +40,8 @@ import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.Gallery;
 import android.widget.ImageView;
+
+import com.irrenhaus.advancedlauncher.R;
 
 public class WallpaperChooser extends Activity implements AdapterView.OnItemSelectedListener,
         OnClickListener {
@@ -97,6 +95,25 @@ public class WallpaperChooser extends Activity implements AdapterView.OnItemSele
 
         mImageView = (ImageView) findViewById(R.id.wallpaper);
     }
+    
+    private void addExtraWallpaper(String extra)
+    {
+    	final Resources resources = getResources();
+        final String packageName = getApplication().getPackageName();
+        
+    	int res = resources.getIdentifier(extra, "drawable", packageName);
+        if (res != 0) {
+            final int thumbRes = resources.getIdentifier(extra + "_small",
+                    "drawable", packageName);
+
+            if (thumbRes != 0) {
+                mThumbs.add(thumbRes);
+                mImages.add(res);
+            }
+        }
+        else
+        	Log.d("WallpaperChooser", "Unknown wallpaper: "+extra);
+    }
 
     private void findWallpapers() {
         mThumbs = new ArrayList<Integer>(THUMB_IDS.length + 4);
@@ -122,55 +139,47 @@ public class WallpaperChooser extends Activity implements AdapterView.OnItemSele
             }
         }
         
-        final int xmlRes = resources.getIdentifier("extra_wallpapers", "xml", packageName);
-        
-        if(xmlRes != 0)
-        {
-        	final XmlResourceParser xml = resources.getXml(xmlRes);
-        	
-        	try {
-				XmlUtils.beginDocument(xml, "wallpaper");
-			} catch (XmlPullParserException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			} catch (IOException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-        	
-        	boolean readNext = true;
-        	
-        	while(readNext)
-        	{
-        		try {
-					int event = xml.nextTag();
-					String extra = xml.nextText();
-					
-					int res = resources.getIdentifier(extra, "drawable", packageName);
-		            if (res != 0) {
-		                final int thumbRes = resources.getIdentifier(extra + "_small",
-		                        "drawable", packageName);
+        AssetManager mgr = resources.getAssets();
 
-		                if (thumbRes != 0) {
-		                    mThumbs.add(thumbRes);
-		                    mImages.add(res);
-		                }
-		            }
-		            else
-		            	Log.d("WallpaperChooser", "Couldn't find wallpaper named "+extra);
-				} catch (XmlPullParserException e) {
-					readNext = false;
-					Log.d("WallpaperChooser", e.getMessage());
-				} catch (IOException e) {
-					readNext = false;
-					Log.d("WallpaperChooser", e.getMessage());
-				}
-        	}
+        try {
+	        InputStream in = mgr.open("wallpapers.txt");
+	        
+	        boolean read = true;
+	        String extra = "";
+	        
+	        while(read)
+	        {
+	        	try {
+	        		int chr = in.read();
+	        		
+	        		
+	        		if(chr == -1)
+	        		{
+	        			if(extra != "" && extra != null)
+	        				addExtraWallpaper(extra);
+	        			break;
+	        		}
+	        		
+	        		if(chr == '\n')
+	        		{
+	        			addExtraWallpaper(extra);
+	        			extra = "";
+	        		}
+	        		else if(chr != '\r')
+	        			extra += (char)chr;
+	        	} catch(IOException e) {
+	        		if(extra != null && extra != "")
+	        		{
+	        			addExtraWallpaper(extra);
+	        		}
+	        		read = false;
+	        	}
+	        }
+        
+	        in.close();
+        } catch(IOException e) {
         	
-        	xml.close();
         }
-        else
-        	Log.d("WallpaperChooser", "Could not find XML resource extra_wallpapers!");
     }
 
     @Override

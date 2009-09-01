@@ -42,7 +42,7 @@ import android.view.animation.TranslateAnimation;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.android.launcher.R;
+import com.irrenhaus.advancedlauncher.R;
 import com.irrenhaus.advancedlauncher.ExtendedDrawerSettings.ExtendedDrawerDBHelper;
 import com.irrenhaus.advancedlauncher.SubMenuSettings.SubMenuDBHelper;
 

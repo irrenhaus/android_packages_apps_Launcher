@@ -41,7 +41,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 
-import com.android.launcher.R;
+import com.irrenhaus.advancedlauncher.R;
 import com.irrenhaus.advancedlauncher.ExtendedDrawerSettings.ExtendedDrawerDBHelper;
 
 public class SubMenuSettings extends ListActivity {
@@ -781,6 +781,14 @@ public class SubMenuSettings extends ListActivity {
 		String submenuOutFile = "submenu.sql";
 		String extendedOutFile = "extendeddrawer.sql";
 		String prefsOutFile = "extendedlauncher.xml";
+		
+		File root = new File("sdcard/" + "AdvancedLauncher");
+		File bla = new File(root, submenuOutFile);
+		if(!bla.exists())
+			return false;
+		bla = new File(root, extendedOutFile);
+		if(!bla.exists())
+			return false;
 		
 		CommandHandler bkupPrefs = new CommandHandler(true, "cp "+outPath+prefsOutFile+" "+prefsFile);
 

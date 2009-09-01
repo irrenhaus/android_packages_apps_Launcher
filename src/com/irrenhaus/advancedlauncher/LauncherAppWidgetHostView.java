@@ -16,7 +16,7 @@
 
 package com.irrenhaus.advancedlauncher;
 
-import com.android.launcher.R;
+import com.irrenhaus.advancedlauncher.R;
 
 import android.appwidget.AppWidgetHostView;
 import android.content.Context;

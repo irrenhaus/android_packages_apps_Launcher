@@ -43,7 +43,7 @@ import android.os.Parcel;
 
 import java.util.ArrayList;
 
-import com.android.launcher.R;
+import com.irrenhaus.advancedlauncher.R;
 
 /**
  * The workspace is a wide area with a wallpaper and a finite number of screens. Each

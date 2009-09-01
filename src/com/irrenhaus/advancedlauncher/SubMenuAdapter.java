@@ -19,7 +19,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-import com.android.launcher.R;
+import com.irrenhaus.advancedlauncher.R;
 import com.irrenhaus.advancedlauncher.SubMenuSettings.SubMenuDBHelper;
 
 public class SubMenuAdapter extends ArrayAdapter<ApplicationInfo> {

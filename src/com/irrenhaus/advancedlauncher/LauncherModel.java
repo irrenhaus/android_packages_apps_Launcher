@@ -50,7 +50,7 @@ import android.os.Process;
 import android.util.Log;
 import android.view.ViewGroup;
 
-import com.android.launcher.R;
+import com.irrenhaus.advancedlauncher.R;
 import com.irrenhaus.advancedlauncher.ExtendedDrawerSettings.ExtendedDrawerDBHelper;
 import com.irrenhaus.advancedlauncher.SubMenuSettings.SubMenuDBHelper;
 

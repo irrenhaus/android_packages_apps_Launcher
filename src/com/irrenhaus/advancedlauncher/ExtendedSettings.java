@@ -10,7 +10,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.AdapterView.OnItemClickListener;
 
-import com.android.launcher.R;
+import com.irrenhaus.advancedlauncher.R;
 import com.irrenhaus.advancedlauncher.extended.display.MenuAdapter;
 import com.irrenhaus.advancedlauncher.extended.display.MenuItem;
 

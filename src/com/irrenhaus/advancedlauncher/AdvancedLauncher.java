@@ -23,7 +23,7 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
-import com.android.launcher.R;
+import com.irrenhaus.advancedlauncher.R;
 import com.irrenhaus.advancedlauncher.SubMenuSettings.SubMenuDBHelper;
 
 import android.app.Activity;

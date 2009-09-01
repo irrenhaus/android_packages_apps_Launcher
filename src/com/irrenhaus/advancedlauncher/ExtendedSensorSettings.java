@@ -1,6 +1,6 @@
 package com.irrenhaus.advancedlauncher;
 
-import com.android.launcher.R;
+import com.irrenhaus.advancedlauncher.R;
 
 import android.app.Activity;
 import android.content.Context;

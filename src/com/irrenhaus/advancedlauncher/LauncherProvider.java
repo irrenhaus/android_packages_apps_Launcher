@@ -47,7 +47,7 @@ import java.util.ArrayList;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParser;
 import com.android.internal.util.XmlUtils;
-import com.android.launcher.R;
+import com.irrenhaus.advancedlauncher.R;
 import com.irrenhaus.advancedlauncher.LauncherSettings.Favorites;
 
 public class LauncherProvider extends ContentProvider {

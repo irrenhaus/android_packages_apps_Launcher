@@ -20,7 +20,7 @@ import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
 
-import com.android.launcher.R;
+import com.irrenhaus.advancedlauncher.R;
 import com.irrenhaus.advancedlauncher.SubMenuSettings.SubMenuDBHelper;
 
 public class SubMenu extends LinearLayout implements OnItemClickListener, OnItemLongClickListener, DragSource, DropTarget {

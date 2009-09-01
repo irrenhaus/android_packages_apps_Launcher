@@ -141,4 +141,5 @@
             android:readPermission="com.irrenhaus.advancedlauncher.permission.READ_SETTINGS" />
 
     </application>
+    <uses-sdk android:minSdkVersion="3" />
 </manifest>

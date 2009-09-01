@@ -27,7 +27,7 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
-import com.android.launcher.R;
+import com.irrenhaus.advancedlauncher.R;
 
 /**
  * Adapter showing the types of items that can be added to a {@link Workspace}.

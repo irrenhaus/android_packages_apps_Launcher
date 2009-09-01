@@ -3,7 +3,7 @@ package com.irrenhaus.advancedlauncher;
 import java.net.URISyntaxException;
 import java.util.List;
 
-import com.android.launcher.R;
+import com.irrenhaus.advancedlauncher.R;
 
 import android.app.ListActivity;
 import android.content.ComponentName;
