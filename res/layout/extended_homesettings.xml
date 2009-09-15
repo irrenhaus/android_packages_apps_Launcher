@@ -5,22 +5,72 @@
     android:layout_height="fill_parent">
 
 
+<ScrollView
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent">
 
+<LinearLayout
+	android:orientation="vertical"
+	android:layout_margin="2px"
+	android:layout_width="fill_parent"
+	android:layout_height="wrap_content">
 
-<LinearLayout android:orientation="vertical" android:layout_margin="10px" android:layout_width="fill_parent" android:layout_height="wrap_content">
+	<TextView
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:id="@+id/TextViewHomeScreens"
+		android:layout_margin="5px"
+		android:text="@string/menu_extended_home_screens"
+		android:textStyle="bold"/>
+	<TextView
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:id="@+id/TextViewHomeScreensNr"/>
+	<SeekBar
+		android:layout_height="wrap_content"
+		android:layout_width="fill_parent"
+		android:id="@+id/SeekBarHomeScreens"
+		android:layout_margin="5px"
+		android:progress="3"
+		android:max="8"/>
+</LinearLayout>
 
-<TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/TextViewHomeScreens" android:layout_margin="5px" android:text="@string/menu_extended_home_screens" android:textStyle="bold"></TextView><TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/TextViewHomeScreensNr"></TextView><SeekBar android:layout_height="wrap_content" android:layout_width="fill_parent" android:id="@+id/SeekBarHomeScreens" android:layout_margin="5px" android:progress="3" android:max="8"></SeekBar>
-
-
-</LinearLayout><LinearLayout android:layout_width="fill_parent" android:orientation="vertical" android:layout_height="wrap_content" android:layout_margin="10px">
+<LinearLayout android:layout_width="fill_parent" android:orientation="vertical" android:layout_height="wrap_content" android:layout_margin="2px">
 
 <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/TextViewDefaultHomeScreen" android:layout_margin="5px" android:text="@string/menu_extended_home_default" android:textStyle="bold"></TextView><TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/TextViewDefaultHomeScreenNr"></TextView><SeekBar android:layout_height="wrap_content" android:layout_width="fill_parent" android:id="@+id/SeekBarDefaultHomeScreen" android:layout_margin="5px" android:max="9"></SeekBar>
 
 
 </LinearLayout>
 
-<TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_margin="20px" android:text="@string/menu_extended_home_info"></TextView>
+<TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_margin="5px" android:text="@string/menu_extended_home_info"></TextView>
 
 <CheckBox android:id="@+id/CheckBoxCloseFolders" android:layout_width="wrap_content" android:layout_height="wrap_content"  android:layout_margin="20px" android:text="@string/menu_extended_close_folders"/>
+
+<LinearLayout
+	android:orientation="vertical"
+	android:layout_margin="2px"
+	android:layout_width="fill_parent"
+	android:layout_height="wrap_content">
+
+	<TextView
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:id="@+id/seekBarAppGridColumnsText"
+		android:layout_margin="5px"
+		android:text="@string/seekBarAppGridColumnsStr"
+		android:textStyle="bold"/>
+	<TextView
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:id="@+id/seekBarAppGridColumnsNr"/>
+	<SeekBar
+		android:layout_height="wrap_content"
+		android:layout_width="fill_parent"
+		android:id="@+id/seekBarAppGridColumns"
+		android:layout_margin="5px"
+		android:progress="5"
+		android:max="10"/>
+</LinearLayout>
+</ScrollView>
 
 </LinearLayout>

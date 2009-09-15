@@ -63,6 +63,34 @@ public class ExtendedHomeSettings extends Activity {
         CheckBoxCloseFolders = (CheckBox)findViewById(R.id.CheckBoxCloseFolders);
         CheckBoxCloseFolders.setChecked(com.android.launcher.extended.data.ExtendedSettings.Home_CloseFolders(context));
         
+        SeekBar seekBarAppGridColumns = (SeekBar)findViewById(R.id.seekBarAppGridColumns);
+        final TextView seekBarAppGridColumnsNr = (TextView)findViewById(R.id.seekBarAppGridColumnsNr);
+        
+        seekBarAppGridColumns.setMax(10);
+        seekBarAppGridColumns.setProgress(com.android.launcher.extended.data.ExtendedSettings.Home_AppGridColumns(context));
+
+        seekBarAppGridColumns.setOnSeekBarChangeListener(new OnSeekBarChangeListener()
+        {
+
+			public void onProgressChanged(SeekBar seekBar, int progress,
+					boolean fromUser) {
+				
+				com.android.launcher.extended.data.ExtendedSettings.Set_Home_AppGridColumns(context, progress);
+				
+				seekBarAppGridColumnsNr.setText(String.valueOf(progress));
+				
+			}
+
+			public void onStartTrackingTouch(SeekBar seekBar) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			public void onStopTrackingTouch(SeekBar seekBar) {
+				// TODO Auto-generated method stub
+				
+			}});
+        
         SeekBarHomeScreens.setOnSeekBarChangeListener(new OnSeekBarChangeListener()
         {
 

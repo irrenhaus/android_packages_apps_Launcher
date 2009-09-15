@@ -1448,9 +1448,8 @@ public final class Launcher extends Activity implements View.OnClickListener, On
                         closeDrawer();
                     } else {
                         closeFolder();
-                    }
-                    if(getModel().currentOpenSubMenu != null)
                     	getModel().closeSubMenu(getModel().currentOpenSubMenu);
+                    }
                     return true;
                 case KeyEvent.KEYCODE_HOME:
                     return true;

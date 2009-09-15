@@ -566,6 +566,9 @@ public class LauncherModel {
     
     public void closeSubMenu(SubMenu menu)
     {
+    	if(menu == null)
+    		return;
+    	
     	ViewGroup parent = (ViewGroup) menu.getParent();
         if (parent != null) {
             parent.removeView(menu);

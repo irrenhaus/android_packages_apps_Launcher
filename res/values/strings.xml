@@ -143,4 +143,6 @@
 	
 	<!-- irrenhaus@xda: Submenu settings -->
 	<string name="menu_submenu">Submenus</string>
+	
+	<string name="seekBarAppGridColumnsStr">ApplicationsGrid columns count</string>
 </resources>

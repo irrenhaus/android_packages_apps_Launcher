@@ -15,6 +15,7 @@ public final class ExtendedSettings {
 		SharedPreferences prefs = context.getSharedPreferences(preferenceName, 0);
 
 		int screens = prefs.getInt(homeTag + "screens", 3);
+		Log.d("ExtendedSettings", "Screens: "+screens);
 
 		return screens;
 	}
@@ -98,6 +99,27 @@ public final class ExtendedSettings {
 		edit.commit();
 
 		Log.d(sensorTag, "Sensor-based rotation set to " + Enabled);
+	}
+
+	public static int Home_AppGridColumns(Context context) {
+
+		SharedPreferences prefs = context.getSharedPreferences(preferenceName, 0);
+
+		int c = prefs.getInt(homeTag + "sensorenabled", 5);
+
+		return c;
+	}
+
+	public static void Set_Home_AppGridColumns(Context context, int count) {
+
+		SharedPreferences prefs = context.getSharedPreferences(preferenceName, 0);
+		SharedPreferences.Editor edit = prefs.edit();
+
+		edit.putInt(homeTag + "sensorenabled", count);
+
+		edit.commit();
+
+		Log.d(homeTag, "ApplicationsGrid column count set to " + count);
 	}
 
 }
