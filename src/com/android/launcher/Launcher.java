@@ -78,8 +78,10 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.OrientationEventListener;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.view.MenuItem.OnMenuItemClickListener;
 import android.view.View.OnLongClickListener;
 import android.view.inputmethod.InputMethodManager;
@@ -596,6 +598,20 @@ public final class Launcher extends Activity implements View.OnClickListener, On
         dragLayer.setIgnoredDropTarget(grid);
         dragLayer.setDragScoller(workspace);
         dragLayer.setDragListener(deleteZone);
+        
+        //irrenhaus@xda
+        OrientationEventListener orientation = new OrientationEventListener(this) {
+			@Override
+			public void onOrientationChanged(int orientation) {
+				WindowManager mgr = (WindowManager) Launcher.this.getSystemService(Context.WINDOW_SERVICE);
+
+				if(mgr.getDefaultDisplay().getOrientation() == 1) //port
+					Launcher.this.mAllAppsGrid.setNumColumns(com.android.launcher.extended.data.ExtendedSettings.Home_AppGridColumns(Launcher.this));
+				else if(mgr.getDefaultDisplay().getOrientation() == 2) //land
+					Launcher.this.mAllAppsGrid.setNumColumns(com.android.launcher.extended.data.ExtendedSettings.Home_AppGridColumns(Launcher.this)+1);
+			}
+        };
+        
     }
 
     /**

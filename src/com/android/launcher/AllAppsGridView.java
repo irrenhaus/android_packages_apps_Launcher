@@ -65,16 +65,6 @@ public class AllAppsGridView extends GridView implements AdapterView.OnItemClick
     protected void onFinishInflate() {
         setOnItemClickListener(this);
         setOnItemLongClickListener(this);
-        
-        int orientation = 0;
-        
-        if(SubMenuSettings.activeLauncher != null)
-        	orientation = SubMenuSettings.activeLauncher.getRequestedOrientation();
-        
-        if(orientation == 0) //land
-        	this.setNumColumns(com.android.launcher.extended.data.ExtendedSettings.Home_AppGridColumns(this.getContext()));
-        else //port
-        	this.setNumColumns(com.android.launcher.extended.data.ExtendedSettings.Home_AppGridColumns(this.getContext())+1);
     }
 
     @Override
