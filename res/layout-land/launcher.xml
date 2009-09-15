@@ -14,16 +14,16 @@
      limitations under the License.
 -->
 
-<com.irrenhaus.advancedlauncher.DragLayer
+<com.android.launcher.DragLayer
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:launcher="http://schemas.android.com/apk/res/com.irrenhaus.advancedlauncher"
+    xmlns:launcher="http://schemas.android.com/apk/res/com.android.launcher"
 
     android:id="@+id/drag_layer"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent">
 
-    <!-- The workspace contains 5 screens of cells -->
-    <com.irrenhaus.advancedlauncher.Workspace
+    <!-- The workspace contains 3 screens of cells -->
+    <com.android.launcher.Workspace
         android:id="@+id/workspace"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
@@ -33,15 +33,8 @@
         <include android:id="@+id/cell1" layout="@layout/workspace_screen" />
         <include android:id="@+id/cell2" layout="@layout/workspace_screen" />
         <include android:id="@+id/cell3" layout="@layout/workspace_screen" />
-        <include android:id="@+id/cell4" layout="@layout/workspace_screen" />
-	<include android:id="@+id/cell5" layout="@layout/workspace_screen" />
-	<include android:id="@+id/cell6" layout="@layout/workspace_screen" />
-	<include android:id="@+id/cell7" layout="@layout/workspace_screen" />
-	<include android:id="@+id/cell8" layout="@layout/workspace_screen" />
-	<include android:id="@+id/cell9" layout="@layout/workspace_screen" />
-	<include android:id="@+id/cell10" layout="@layout/workspace_screen" />
 
-    </com.irrenhaus.advancedlauncher.Workspace>
+    </com.android.launcher.Workspace>
 
     <SlidingDrawer
         android:id="@+id/drawer"
@@ -53,7 +46,7 @@
         android:handle="@+id/all_apps"
         android:content="@+id/content">
         
-        <com.irrenhaus.advancedlauncher.HandleView
+        <com.android.launcher.HandleView
             android:id="@id/all_apps"
             android:layout_width="56dip"
             android:layout_height="fill_parent"
@@ -68,7 +61,7 @@
 
             launcher:direction="vertical" />
 
-        <com.irrenhaus.advancedlauncher.AllAppsGridView
+        <com.android.launcher.AllAppsGridView
             android:id="@id/content"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
@@ -89,7 +82,7 @@
 
     </SlidingDrawer>
 
-    <com.irrenhaus.advancedlauncher.DeleteZone
+    <com.android.launcher.DeleteZone
         android:id="@+id/delete_zone"
         android:layout_width="49dip"
         android:layout_height="wrap_content"
@@ -104,4 +97,4 @@
 
         launcher:direction="vertical" />
 
-</com.irrenhaus.advancedlauncher.DragLayer>
+</com.android.launcher.DragLayer>

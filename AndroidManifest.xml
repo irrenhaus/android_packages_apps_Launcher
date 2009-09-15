@@ -19,31 +19,30 @@
 -->
 <manifest
     xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.irrenhaus.advancedlauncher"
-      android:versionCode="1"
-      android:versionName="1.0">
+    package="com.android.launcher"
+    android:sharedUserId="android.uid.shared"
+    android:sharedUserLabel="@string/uid_name">
 
     <permission
-        android:name="com.irrenhaus.advancedlauncher.permission.INSTALL_SHORTCUT"
+        android:name="com.android.launcher.permission.INSTALL_SHORTCUT"
         android:permissionGroup="android.permission-group.SYSTEM_TOOLS"
         android:protectionLevel="normal"
         android:label="@string/permlab_install_shortcut"
         android:description="@string/permdesc_install_shortcut" />
-        
     <permission
-        android:name="com.irrenhaus.advancedlauncher.permission.UNINSTALL_SHORTCUT"
+        android:name="com.android.launcher.permission.UNINSTALL_SHORTCUT"
         android:permissionGroup="android.permission-group.SYSTEM_TOOLS"
         android:protectionLevel="normal"
         android:label="@string/permlab_uninstall_shortcut"
         android:description="@string/permdesc_uninstall_shortcut"/>
     <permission
-        android:name="com.irrenhaus.advancedlauncher.permission.READ_SETTINGS"
+        android:name="com.android.launcher.permission.READ_SETTINGS"
         android:permissionGroup="android.permission-group.SYSTEM_TOOLS"
         android:protectionLevel="normal"
         android:label="@string/permlab_read_settings"
         android:description="@string/permdesc_read_settings"/>
     <permission
-        android:name="com.irrenhaus.advancedlauncher.permission.WRITE_SETTINGS"
+        android:name="com.android.launcher.permission.WRITE_SETTINGS"
         android:permissionGroup="android.permission-group.SYSTEM_TOOLS"
         android:protectionLevel="normal"
         android:label="@string/permlab_write_settings"
@@ -57,10 +56,9 @@
     <uses-permission android:name="android.permission.SET_WALLPAPER_HINTS" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.WRITE_SETTINGS" />
+    <uses-permission android:name="android.permission.BIND_APPWIDGET" />
     <uses-permission android:name="com.android.launcher.permission.READ_SETTINGS" />
     <uses-permission android:name="com.android.launcher.permission.WRITE_SETTINGS" />
-    <uses-permission android:name="com.irrenhaus.advancedlauncher.permission.READ_SETTINGS" />
-    <uses-permission android:name="com.irrenhaus.advancedlauncher.permission.WRITE_SETTINGS" />
     <uses-permission android:name="android.permission.RESTART_PACKAGES" />
 
     <application
@@ -70,11 +68,12 @@
         android:icon="@drawable/ic_launcher_home">
 
         <activity
-            android:name="AdvancedLauncher"
+            android:name="Launcher"
             android:launchMode="singleTask"
             android:clearTaskOnLaunch="true"
             android:stateNotNeeded="true"
             android:theme="@style/Theme"
+            android:screenOrientation="nosensor"
             android:windowSoftInputMode="stateUnspecified|adjustPan">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -83,8 +82,8 @@
                 <category android:name="android.intent.category.MONKEY" />
             </intent-filter>
         </activity>
-
-	    <activity android:name="ExtendedSettings" android:label="@string/menu_extended" />
+        
+        <activity android:name="ExtendedSettings" android:label="@string/menu_extended" />
 	    <activity android:name="ExtendedDrawerSettings" android:label="@string/menu_extended_drawer" />
     	<activity android:name="ExtendedHomeSettings" android:label="@string/menu_extended_home" />
         <activity android:name="ExtendedSensorSettings" android:label="@string/menu_extended_sensor" />
@@ -109,7 +108,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        
+
         <!-- Enable system-default search mode for any activity in Home -->
         <meta-data
             android:name="android.app.default_searchable"
@@ -118,28 +117,27 @@
         <!-- Intent received used to install shortcuts from other applications -->
         <receiver
             android:name=".InstallShortcutReceiver"
-            android:permission="com.irrenhaus.advancedlauncher.permission.INSTALL_SHORTCUT">
+            android:permission="com.android.launcher.permission.INSTALL_SHORTCUT">
             <intent-filter>
-                <action android:name="com.irrenhaus.advancedlauncher.action.INSTALL_SHORTCUT" />
+                <action android:name="com.android.launcher.action.INSTALL_SHORTCUT" />
             </intent-filter>
         </receiver>
 
         <!-- Intent received used to uninstall shortcuts from other applications -->
         <receiver
             android:name=".UninstallShortcutReceiver"
-            android:permission="com.irrenhaus.advancedlauncher.permission.UNINSTALL_SHORTCUT">
+            android:permission="com.android.launcher.permission.UNINSTALL_SHORTCUT">
             <intent-filter>
-                <action android:name="com.irrenhaus.advancedlauncher.action.UNINSTALL_SHORTCUT" />
+                <action android:name="com.android.launcher.action.UNINSTALL_SHORTCUT" />
             </intent-filter>
         </receiver>
 
         <!-- The settings provider contains Home's data, like the workspace favorites -->
         <provider
             android:name="LauncherProvider"
-            android:authorities="com.irrenhaus.advancedlauncher.settings"
-            android:writePermission="com.irrenhaus.advancedlauncher.permission.WRITE_SETTINGS"
-            android:readPermission="com.irrenhaus.advancedlauncher.permission.READ_SETTINGS" />
+            android:authorities="com.android.launcher.settings"
+            android:writePermission="com.android.launcher.permission.WRITE_SETTINGS"
+            android:readPermission="com.android.launcher.permission.READ_SETTINGS" />
 
     </application>
-    <uses-sdk android:minSdkVersion="3" />
 </manifest>

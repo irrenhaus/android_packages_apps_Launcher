@@ -14,12 +14,7 @@
      limitations under the License.
 -->
 
-<favorites xmlns:launcher="http://schemas.android.com/apk/res/com.irrenhaus.advancedlauncher">
-
-    <clock
-        launcher:screen="2"
-        launcher:x="1"
-        launcher:y="0" />
+<favorites xmlns:launcher="http://schemas.android.com/apk/res/com.android.launcher">
 
     <search
         launcher:screen="1"
